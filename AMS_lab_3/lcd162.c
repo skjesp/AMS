@@ -27,6 +27,7 @@
 
 // library function itoa() is needed
 #include <stdlib.h>
+#include <string.h>
 
 //*********************** PRIVATE (static) operations *********************
 static void waitBusy()
@@ -37,9 +38,9 @@ static void waitBusy()
 static void pulse_E()
 { 
   // Enable E
-  PORTH |= 0b01000000; // bit 6 set.
+  PORTH |= 0b01000000; // bit 6 set. (According to Lab Exercise document page 3.)
   
-  // 5x nop
+  // 5x nop, (Waiting 312,5 ns).
   _NOP();
   _NOP();
   _NOP();
@@ -49,10 +50,9 @@ static void pulse_E()
   // disable E
   PORTH &= 0b10111111; // bit 6 cleared
   
-  // Enable cycle time. min 500 ns
+  // Enable cycle time. min 500 ns. NOP delay is 125 ns. Return and call also takes time.
   _NOP();
   _NOP();
-  // Return and call takes time.
 }
 
 // Sets the display data pins according to the 4 lower bits of data
@@ -205,16 +205,27 @@ void LCDDispString(char* str)
 // Displays the value of integer "i" at "current display position"
 void LCDDispInteger(int i)
 {
-	char buffer[20];
-	itoa(i, buffer, 10);
+	unsigned char buffer;
+	memcpy(&buffer, &i, sizeof(i));
+	//itoa(i, buffer, 10);
 	sendData(buffer);  
 }
 
 // Loads one of the 8 user definable characters (UDC) with a dot-pattern,
 // pre-defined in an 8 byte array in FLASH memory
+// The parameter *UDCTab is a pointer to the array containing the bit (dot) pattern
+// The parameter UDCNo (0 to 7), defines which of the 8 CGRAM characters is to be loaded.
 void LCDLoadUDC(unsigned char UDCNo, const unsigned char *UDCTab)
 {
-  // To be implemented		
+	// UDCNo must be a value between 0b0 and 0b1111 (0-7)
+	sendData(UDCNo); // Set character Codes.
+
+	// There is a array containing the bit pattern. These arrays are defined in the test.
+	for(int i = 0; i < 8; i++)
+	{		
+		sendInstruction(i); // send the linenumber
+		sendData(UDCTab[i]); // send the line for the bit-pattern.		
+	}
 }
 
 // Selects, if the cursor has to be visible, and if the character at
@@ -223,42 +234,57 @@ void LCDLoadUDC(unsigned char UDCNo, const unsigned char *UDCTab)
 // "blink" not 0 => the character at the cursor position blinks.
 void LCDOnOffControl(unsigned char cursor, unsigned char blink)
 {
-  // To be implemented
+	unsigned char LCD_command = 0b00001100; // Display (bit 3) always on.
+	if(cursor) // If cursor == 1
+	{
+		LCD_command |= 1 << 1;
+	}
+	if(blink)
+	{
+		LCD_command |= 1 << 0; // "<< 0" is redundant, but is written for educational purposes.
+	}	
+	sendInstruction(LCD_command);  
 }
 
 // Moves the cursor to the left
 void LCDCursorLeft()
 {
-  // To be implemented
+	sendInstruction(0b00010000);
 }
 
 // Moves the cursor to the right
 void LCDCursorRight()
 {
-  // To be implemented
+	sendInstruction(0b00010100);
 }
 
 // Moves the display text one position to the left
 void LCDShiftLeft()
 {
-  // To be implemented
+	sendInstruction(0b00011000);
 }
 
 // Moves the display text one position to the right
 void LCDShiftRight()
 {
-  // To be implemented
+  sendInstruction(0b00010100);
 }
 
 // Sets the backlight intensity to "percent" (0-100)
 void setBacklight(unsigned char percent)
 {
-  // To be implemented
+	//// TODO: Set these values in a init function.
+	//TCCR1A = 0b10000011;
+	//TCCR1B = 0b00000001;
+	//
+	//// The pin is connected to a PWM regulator.
+	//OCR2A = (1023 * atoi(percent) / 100);
 }
 
 // Reads the status for the 5 on board keys
 // Returns 0, if no key pressed
 unsigned char readKeys()
 {
-  // To be implemented
+	// To be implemented
+	return 0;
 }
