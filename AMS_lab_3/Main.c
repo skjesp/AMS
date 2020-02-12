@@ -82,7 +82,7 @@ int i;
   // Initialize the display
   LCDInit();
 
-  // Loading UDC (CGRAM) with the dot patterns for Æ,Ø,Å,æ,ø,å
+   //Loading UDC (CGRAM) with the dot patterns for Æ,Ø,Å,æ,ø,å
   LCDLoadUDC(0,capital_ae);
   LCDLoadUDC(1,capital_oe);
   LCDLoadUDC(2,capital_aa);

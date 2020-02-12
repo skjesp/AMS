@@ -32,7 +32,7 @@
 //*********************** PRIVATE (static) operations *********************
 static void waitBusy()
 {
-  _delay_ms(2);
+  _delay_ms(5);
 }  
 
 static void pulse_E()
@@ -66,8 +66,8 @@ static void set4DataPins(unsigned char data)
 static void sendInstruction(unsigned char data)
 {      
   // set rs low.
-  _NOP();
-  PORTH &= 0b11011111;
+  waitBusy();
+  PORTH &= 0b10011111;
   
   // wait nop (t_as)
   _NOP();
@@ -91,10 +91,12 @@ static void sendInstruction(unsigned char data)
 static void sendData(unsigned char data)
 {      
     // set rs high.
-	_NOP();
+	waitBusy();
+	
     PORTH |= 0b00100000;
+    PORTH &= ~(0b01000000);
     
-    // wait nop (t_as)
+	// wait nop (t_as)
     _NOP();
     
     // set databit (first 7, 6, 5, 4)
@@ -110,7 +112,7 @@ static void sendData(unsigned char data)
     pulse_E();
     
     // make delay nop (min 40 micro sec)
-    _NOP();
+    _delay_us(50);
 	// call and return takes time.
 }
 
@@ -165,7 +167,7 @@ void LCDInit()
 // the upper line, leftmost character
 void LCDClear()
 {
-  sendInstruction('1');  
+  sendInstruction(0b00000001); 
 }
 
 // Sets DDRAM address to character position x and line number y
@@ -174,7 +176,7 @@ void LCDGotoXY( unsigned char x, unsigned char y )
   char data = 0b10000000;
   
   // Set DB7 1  
-  if(y == '1')
+  if(y == 1)
   {
 	  data |= 0b01000000;	// Adding 0x40 to DDRAM-address.
   }
@@ -189,26 +191,27 @@ void LCDGotoXY( unsigned char x, unsigned char y )
 
 // Display "ch" at "current display position"
 void LCDDispChar(char ch)
-{
-  sendData(ch);
+{	
+	sendData(ch);
 }
 
 // Displays the string "str" starting at "current display position"
 void LCDDispString(char* str)
 {
 	for(int i = 0; i< strlen(str); i++)
-	{
+	{	
 		sendData(str[i]);
 	}
 }
 
 // Displays the value of integer "i" at "current display position"
 void LCDDispInteger(int i)
-{
-	unsigned char buffer;
-	memcpy(&buffer, &i, sizeof(i));
-	//itoa(i, buffer, 10);
-	sendData(buffer);  
+{	
+	
+	char buffer[13]; 
+	itoa(i, buffer, 10);
+	
+	LCDDispString(buffer);	
 }
 
 // Loads one of the 8 user definable characters (UDC) with a dot-pattern,
@@ -217,15 +220,15 @@ void LCDDispInteger(int i)
 // The parameter UDCNo (0 to 7), defines which of the 8 CGRAM characters is to be loaded.
 void LCDLoadUDC(unsigned char UDCNo, const unsigned char *UDCTab)
 {
-	// UDCNo must be a value between 0b0 and 0b1111 (0-7)
-	sendData(UDCNo); // Set character Codes.
-
-	// There is a array containing the bit pattern. These arrays are defined in the test.
-	for(int i = 0; i < 8; i++)
-	{		
-		sendInstruction(i); // send the linenumber
-		sendData(UDCTab[i]); // send the line for the bit-pattern.		
+	unsigned char cgram_addr = 0b01000000;
+	cgram_addr |= (UDCNo << 3);
+	sendInstruction(cgram_addr);	
+	
+	for(int i = 0; i< 8; i++)
+	{
+		sendData(UDCTab[i]);		
 	}
+	sendInstruction(0b00000010);
 }
 
 // Selects, if the cursor has to be visible, and if the character at
@@ -267,7 +270,7 @@ void LCDShiftLeft()
 // Moves the display text one position to the right
 void LCDShiftRight()
 {
-  sendInstruction(0b00010100);
+	sendInstruction(0b00011100);
 }
 
 // Sets the backlight intensity to "percent" (0-100)
