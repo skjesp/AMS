@@ -116,6 +116,28 @@ static void sendData(unsigned char data)
 	// call and return takes time.
 }
 
+static void Timer2_Init()
+{
+	// Fast PWM, OC1A (= PB4) non-inverted mode
+	TCCR2A = 0b10000011;
+	// Prescaler = 1024
+	TCCR2B = 0b00000111;
+	// Duty cycæe = 25 %
+	OCR2A = 255/4;
+	// Pin OC1A (= PB4) is output
+	DDRB |= (1<<4);	
+}
+
+// A/D converter is used for switch readings
+static void ADC_Init()
+{
+	// ADC reference = 5 volt, Input = ADC0
+	ADMUX = 0b01000000;
+	// ADC enable, Free running, No interrupts, Prescaler = 128.
+	ADCSRA = 0b11100111;
+	ADCSRB = 0b00000000;	
+}
+
 //*********************** PUBLIC functions *****************************
 
 // Initializes the display, blanks it and sets "current display position"
@@ -161,6 +183,9 @@ void LCDInit()
   sendInstruction( 0b00000110 );
   // Display ON, cursor and blinking OFF
   sendInstruction( 0b00001100 );
+  
+  Timer2_Init();
+  ADC_Init();
 }
 
 // Blanks the display and sets "current display position" to
@@ -276,18 +301,24 @@ void LCDShiftRight()
 // Sets the backlight intensity to "percent" (0-100)
 void setBacklight(unsigned char percent)
 {
-	//// TODO: Set these values in a init function.
-	//TCCR1A = 0b10000011;
-	//TCCR1B = 0b00000001;
-	//
-	//// The pin is connected to a PWM regulator.
-	//OCR2A = (1023 * atoi(percent) / 100);
+	if(percent <= 100)
+		OCR2A = (percent*255) / 100;
 }
 
 // Reads the status for the 5 on board keys
 // Returns 0, if no key pressed
 unsigned char readKeys()
 {
-	// To be implemented
+	if(ADCW < 50)
+		return 1;
+	if(ADCW < 195)
+		return 2;
+	if(ADCW < 380)
+		return 3;
+	if(ADCW < 555)
+		return 4;
+	if(ADCW < 790)
+		return 5;
+	
 	return 0;
 }
