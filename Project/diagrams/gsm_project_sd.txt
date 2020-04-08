@@ -1,0 +1,51 @@
+frame GSM command
+
+actor Phone
+participant "Gsm module" as gsm
+participant "GSM interpreter" as ci
+participant "Command handler" as ch
+participant "Motor controller" as dcc
+participant "DC motor" as dc
+
+Phone->>gsm:receiveSMS()
+activate gsm #lightgrey
+gsm->>ci:validateCommand(String command)
+activate ci #lightgrey
+
+alt Command Invalid
+ci->>gsm:sendSMS(String errorMsg, int phoneNumber)
+
+gsm->>Phone:Receives SMS containing error message
+else Command OK
+ci->ch:handleCommand(int com)
+activate ch #lightgrey
+end
+
+alt lock
+ch->dcc:doLockMechanism()
+activate dcc #lightgrey
+dcc->>dc:locking
+dcc-->>ch:int: result
+deactivate dcc
+
+
+else unlock
+ch->dcc:doUnlockMechanism()
+activate dcc #lightgrey
+
+dcc->>dc:locking
+dcc-->>ch:int: result
+deactivate dcc
+end
+
+
+ch-->>ci:int: result
+deactivate ch
+
+ci->>gsm:SendSMS(String result)
+deactivate ci
+
+
+Phone<<-gsm:Receives SMS containing OK message
+deactivate gsm
+deactivate gsm
