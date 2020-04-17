@@ -8,6 +8,8 @@
 //#define BAUD 115200
 #include "communication.h"
 #include <avr/io.h>
+#include <string.h>
+#include <util/delay.h>
 
 void EnableUART(int uartNum)
 {
@@ -16,14 +18,14 @@ void EnableUART(int uartNum)
 			UCSR0A = 0b00100000;
 			UCSR0B = 0b00011000; // enable transmitter and receiver. No interrupts.
 			UCSR0C = 0b00000110; // 8 databit
-			UBRR0 = 103; // Baud set to 9600. See slide 36 lecture 17 MSYS.
+			UBRR0 = 8; // Baud set to 115200. See slide 36 lecture 17 MSYS. 9600 baud
 			break;
 		
 		case 1:
 			UCSR1A = 0b00100000;
 			UCSR1B = 0b00011000;
 			UCSR1C = 0b00000110;
-			UBRR1 = 103;
+			UBRR1 = 8;// 103; 115200 baud
 			break;
 			
 		case 2:
@@ -39,6 +41,24 @@ void EnableUART(int uartNum)
 		default:
 			break;
 	}
+}
+
+
+unsigned char CharReady(int uartNum){
+	switch(uartNum)
+	{
+		case 0:
+		return UCSR0A & (1<<7);		
+		break;
+		
+		case 1:
+		return UCSR1A & (1<<7);
+		break;
+		
+		default:
+		break;
+	}
+	return 0;
 }
 
 
@@ -105,20 +125,6 @@ void SendChar(int uartNum, char c)
 }
 
 
-void testSendString(char* str)
-{
-	while(*str != 0)
-	{
-		// Wait for transmitter register empty (ready for new character)
-		while ( (UCSR1A & (1<<5)) == 0 )
-		{}
-		// Then send the character
-		UDR1 = *str;
-		str++;	
-	}
-}
-
-
 
 // Modified code from uart.c from BB.
 void SendString(int uartNum, char* str)
@@ -130,4 +136,51 @@ void SendString(int uartNum, char* str)
 		// Advance the pointer one step
 		str++;			
 	}	
+}
+
+void sendATcommand(char* ATcommand, char* response, int selected_UART, char* expectedResult)//, char* expected_answer, unsigned int timeout)
+{				
+	// Clean inputbuffer
+	while(CharReady(selected_UART))
+	{
+		ReadChar(selected_UART);
+	}
+	
+	// Concatenate command with newline.
+	char AT_command_buf[255] = "";
+	strcpy(AT_command_buf,ATcommand);
+	strcat(AT_command_buf, "\r\n\0");
+	SendString(selected_UART, AT_command_buf);
+	
+			
+	int i = 0;
+	int elapsedms = 0;
+	char c;
+	//// this loop waits for the answer
+	do{
+		// if there are data in the UART input buffer, reads it and checks for the answer
+		if(CharReady(selected_UART))
+		{						
+			c = ReadChar(selected_UART);
+			response[i] = c;
+			i++;
+
+			// Check if expected result is somewhere in the response.			
+			if(strstr(response, expectedResult) != NULL){				
+				return;
+			}
+		}
+		else
+		{
+			//_delay_ms(1);
+			//elapsedms += 1;
+			//if(elapsedms > 1500)
+			//{
+				//SendString(UART_PC, "AT command has timed out.\r\n");				
+				//return;
+			//}
+		}
+		// Waits for the answer with time out
+	}
+	while(1);	
 }

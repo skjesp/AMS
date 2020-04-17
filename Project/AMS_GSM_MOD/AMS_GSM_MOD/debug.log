@@ -1,0 +1,4 @@
+[0411/130148:ERROR:ipc_channel_win.cc(512)] pipe error: 232
+[0411/170143:WARNING:dns_config_service_win.cc(674)] Failed to read DnsConfig.
+[0411/175009:WARNING:dns_config_service_win.cc(674)] Failed to read DnsConfig.
+[0411/175010:WARNING:dns_config_service_win.cc(674)] Failed to read DnsConfig.

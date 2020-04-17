@@ -1,71 +1,34 @@
-///
- //* main.c
- //*
- //* Created: 07-04-2020 13:06:00
- //*  Author: Johannes and Lasse
- //*/ 
+////3G + GPS shield
+////
+////main.c
+////
+////Created: 07-04-2020 13:06:00
+////Author: Johannes
 
-//#include <stdlib.h>
-#include <stdio.h>
-#include <avr/io.h>
-// Uart
-//#include "uart.h"
-#include "communication.h"
-#define UART_PC 0
-#define UART_GSM 1
-#define UART_TEST 2
-#define F_CPU 16000000
+#include "project_definitions.h"
 
-#define databits 8
-#define INPUT_MAX 255
-
-int main(){
-	//InitUART(myUART, baud, databits, 'N');
-	//InitUART(UART_PC, 112500, 8, 'N'); // 9600
-	//InitUART(UART_GSM, 112500, 8, 'N');
-	//InitUART(UART_TEST, 112500, 8, 'N');
-	
-	EnableUART(UART_PC);
-	EnableUART(UART_GSM);
-	EnableUART(UART_TEST);
+int main()
+{
+	Setup();
+	char buf[255] = "";	
+	SendString(UART_PC, "TEST START.\r\n");	
+	sendATcommand("AT", buf, UART_GSM, "OK");
 	
 	
-	// Comment this in for testing
-	//while(1)
-	//{	
-		//char c = ReadChar(0);
-		//SendChar(0, c);		
-	//}
+	// DO NOT DELETE!!
+	//sendATcommand("AT+CPIN\"6913\"", buf, UART_GSM, "OK");
+	//sendATcommand("AT+CMGF=1", buf, UART_GSM, "OK");
+	//sendATcommand("AT+CMGS=\"+4523920863\"", buf, UART_GSM, ">");
 	
 	
-	SendString(UART_PC, "Starting GSM\r\n");
 	
+	//SendString(UART_PC, "AT command has timed out.\r\n");
+	SendString(UART_PC, "Going to while loop\r\n");
 	while(1)
-	{
-		char c = ReadChar(UART_PC);
-		SendChar(UART_PC, c);
+	{	
+		char c = ReadChar(UART_GSM);	
+		SendChar(UART_PC, c);			
 	}
-	
-	
-	while(1)
-	{
-		SendString(UART_GSM, "AT");
-		SendChar(UART_GSM, 0x0D); // carriage return
-		SendChar(UART_GSM, 0x0A); // line feed
-		while(1){
-			char c = ReadChar(UART_GSM);
-			SendChar(UART_PC,c);
-		}
-		
-		
-		
-		//char c = ReadChar(UART_PC);
-		//SendChar(UART_GSM, c);
-		//char c2 = ReadChar(UART_GSM);
-		//SendChar(UART_PC,c2);
-		
-	}
-	
 	
 	
 	//while(1){
@@ -121,3 +84,5 @@ int main(){
 }
 
 //The entered char was: 
+
+

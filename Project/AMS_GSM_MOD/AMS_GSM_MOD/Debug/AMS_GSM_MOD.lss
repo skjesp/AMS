@@ -3,29 +3,29 @@ AMS_GSM_MOD.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000010  00800200  0000037c  000003f0  2**0
+  0 .data         0000002a  00800200  000003c8  0000043c  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         0000037c  00000000  00000000  00000074  2**1
+  1 .text         000003c8  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .comment      00000030  00000000  00000000  00000400  2**0
+  2 .comment      00000030  00000000  00000000  00000466  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000430  2**2
+  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000498  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000060  00000000  00000000  00000470  2**0
+  4 .debug_aranges 000000a0  00000000  00000000  000004d8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000dc1  00000000  00000000  000004d0  2**0
+  5 .debug_info   000012d4  00000000  00000000  00000578  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000c24  00000000  00000000  00001291  2**0
+  6 .debug_abbrev 00000e1c  00000000  00000000  0000184c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000004e7  00000000  00000000  00001eb5  2**0
+  7 .debug_line   000006b7  00000000  00000000  00002668  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  000000e8  00000000  00000000  0000239c  2**2
+  8 .debug_frame  00000150  00000000  00000000  00002d20  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000581  00000000  00000000  00002484  2**0
+  9 .debug_str    00000667  00000000  00000000  00002e70  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    000001b0  00000000  00000000  00002a05  2**0
+ 10 .debug_loc    000004ee  00000000  00000000  000034d7  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000040  00000000  00000000  00002bb5  2**0
+ 11 .debug_ranges 00000070  00000000  00000000  000039c5  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -160,395 +160,556 @@ Disassembly of section .text:
   f4:	12 e0       	ldi	r17, 0x02	; 2
   f6:	a0 e0       	ldi	r26, 0x00	; 0
   f8:	b2 e0       	ldi	r27, 0x02	; 2
-  fa:	ec e7       	ldi	r30, 0x7C	; 124
+  fa:	e8 ec       	ldi	r30, 0xC8	; 200
   fc:	f3 e0       	ldi	r31, 0x03	; 3
   fe:	00 e0       	ldi	r16, 0x00	; 0
  100:	0b bf       	out	0x3b, r16	; 59
  102:	02 c0       	rjmp	.+4      	; 0x108 <__do_copy_data+0x14>
  104:	07 90       	elpm	r0, Z+
  106:	0d 92       	st	X+, r0
- 108:	a0 31       	cpi	r26, 0x10	; 16
+ 108:	aa 32       	cpi	r26, 0x2A	; 42
  10a:	b1 07       	cpc	r27, r17
  10c:	d9 f7       	brne	.-10     	; 0x104 <__do_copy_data+0x10>
- 10e:	18 d1       	rcall	.+560    	; 0x340 <main>
- 110:	33 c1       	rjmp	.+614    	; 0x378 <_exit>
+ 10e:	f6 d0       	rcall	.+492    	; 0x2fc <main>
+ 110:	59 c1       	rjmp	.+690    	; 0x3c4 <_exit>
 
 00000112 <__bad_interrupt>:
  112:	76 cf       	rjmp	.-276    	; 0x0 <__vectors>
 
 00000114 <EnableUART>:
-		{}
-		// Then send the character
-		UDR1 = *str;
-		str++;	
+#include <string.h>
+#include <util/delay.h>
+
+void EnableUART(int uartNum)
+{
+	switch(uartNum){
+ 114:	81 30       	cpi	r24, 0x01	; 1
+ 116:	91 05       	cpc	r25, r1
+ 118:	a9 f0       	breq	.+42     	; 0x144 <EnableUART+0x30>
+ 11a:	82 30       	cpi	r24, 0x02	; 2
+ 11c:	91 05       	cpc	r25, r1
+ 11e:	11 f1       	breq	.+68     	; 0x164 <EnableUART+0x50>
+ 120:	89 2b       	or	r24, r25
+ 122:	79 f5       	brne	.+94     	; 0x182 <EnableUART+0x6e>
+		case 0:			
+			UCSR0A = 0b00100000;
+ 124:	80 e2       	ldi	r24, 0x20	; 32
+ 126:	80 93 c0 00 	sts	0x00C0, r24	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7000c0>
+			UCSR0B = 0b00011000; // enable transmitter and receiver. No interrupts.
+ 12a:	88 e1       	ldi	r24, 0x18	; 24
+ 12c:	80 93 c1 00 	sts	0x00C1, r24	; 0x8000c1 <__TEXT_REGION_LENGTH__+0x7000c1>
+			UCSR0C = 0b00000110; // 8 databit
+ 130:	86 e0       	ldi	r24, 0x06	; 6
+ 132:	80 93 c2 00 	sts	0x00C2, r24	; 0x8000c2 <__TEXT_REGION_LENGTH__+0x7000c2>
+			UBRR0 = 8; // Baud set to 115200. See slide 36 lecture 17 MSYS. 9600 baud
+ 136:	88 e0       	ldi	r24, 0x08	; 8
+ 138:	90 e0       	ldi	r25, 0x00	; 0
+ 13a:	90 93 c5 00 	sts	0x00C5, r25	; 0x8000c5 <__TEXT_REGION_LENGTH__+0x7000c5>
+ 13e:	80 93 c4 00 	sts	0x00C4, r24	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7000c4>
+			break;
+ 142:	08 95       	ret
+		
+		case 1:
+			UCSR1A = 0b00100000;
+ 144:	80 e2       	ldi	r24, 0x20	; 32
+ 146:	80 93 c8 00 	sts	0x00C8, r24	; 0x8000c8 <__TEXT_REGION_LENGTH__+0x7000c8>
+			UCSR1B = 0b00011000;
+ 14a:	88 e1       	ldi	r24, 0x18	; 24
+ 14c:	80 93 c9 00 	sts	0x00C9, r24	; 0x8000c9 <__TEXT_REGION_LENGTH__+0x7000c9>
+			UCSR1C = 0b00000110;
+ 150:	86 e0       	ldi	r24, 0x06	; 6
+ 152:	80 93 ca 00 	sts	0x00CA, r24	; 0x8000ca <__TEXT_REGION_LENGTH__+0x7000ca>
+			UBRR1 = 8;// 103; 115200 baud
+ 156:	88 e0       	ldi	r24, 0x08	; 8
+ 158:	90 e0       	ldi	r25, 0x00	; 0
+ 15a:	90 93 cd 00 	sts	0x00CD, r25	; 0x8000cd <__TEXT_REGION_LENGTH__+0x7000cd>
+ 15e:	80 93 cc 00 	sts	0x00CC, r24	; 0x8000cc <__TEXT_REGION_LENGTH__+0x7000cc>
+			break;
+ 162:	08 95       	ret
+			
+		case 2:
+			UCSR2A = 0b00100000;
+ 164:	80 e2       	ldi	r24, 0x20	; 32
+ 166:	80 93 d0 00 	sts	0x00D0, r24	; 0x8000d0 <__TEXT_REGION_LENGTH__+0x7000d0>
+			UCSR2B = 0b00011000;
+ 16a:	88 e1       	ldi	r24, 0x18	; 24
+ 16c:	80 93 d1 00 	sts	0x00D1, r24	; 0x8000d1 <__TEXT_REGION_LENGTH__+0x7000d1>
+			UCSR2C = 0b00000110;
+ 170:	86 e0       	ldi	r24, 0x06	; 6
+ 172:	80 93 d2 00 	sts	0x00D2, r24	; 0x8000d2 <__TEXT_REGION_LENGTH__+0x7000d2>
+			UBRR2 = 103;			
+ 176:	87 e6       	ldi	r24, 0x67	; 103
+ 178:	90 e0       	ldi	r25, 0x00	; 0
+ 17a:	90 93 d5 00 	sts	0x00D5, r25	; 0x8000d5 <__TEXT_REGION_LENGTH__+0x7000d5>
+ 17e:	80 93 d4 00 	sts	0x00D4, r24	; 0x8000d4 <__TEXT_REGION_LENGTH__+0x7000d4>
+ 182:	08 95       	ret
+
+00000184 <CharReady>:
 	}
 }
- 114:	cf 93       	push	r28
- 116:	df 93       	push	r29
- 118:	1f 92       	push	r1
- 11a:	1f 92       	push	r1
- 11c:	cd b7       	in	r28, 0x3d	; 61
- 11e:	de b7       	in	r29, 0x3e	; 62
- 120:	9a 83       	std	Y+2, r25	; 0x02
- 122:	89 83       	std	Y+1, r24	; 0x01
- 124:	89 81       	ldd	r24, Y+1	; 0x01
- 126:	9a 81       	ldd	r25, Y+2	; 0x02
- 128:	81 30       	cpi	r24, 0x01	; 1
- 12a:	91 05       	cpc	r25, r1
- 12c:	21 f1       	breq	.+72     	; 0x176 <EnableUART+0x62>
- 12e:	82 30       	cpi	r24, 0x02	; 2
- 130:	91 05       	cpc	r25, r1
- 132:	1c f4       	brge	.+6      	; 0x13a <EnableUART+0x26>
- 134:	89 2b       	or	r24, r25
- 136:	41 f0       	breq	.+16     	; 0x148 <EnableUART+0x34>
- 138:	4d c0       	rjmp	.+154    	; 0x1d4 <EnableUART+0xc0>
- 13a:	82 30       	cpi	r24, 0x02	; 2
- 13c:	91 05       	cpc	r25, r1
- 13e:	91 f1       	breq	.+100    	; 0x1a4 <EnableUART+0x90>
- 140:	03 97       	sbiw	r24, 0x03	; 3
- 142:	09 f4       	brne	.+2      	; 0x146 <EnableUART+0x32>
- 144:	46 c0       	rjmp	.+140    	; 0x1d2 <EnableUART+0xbe>
- 146:	46 c0       	rjmp	.+140    	; 0x1d4 <EnableUART+0xc0>
- 148:	80 ec       	ldi	r24, 0xC0	; 192
- 14a:	90 e0       	ldi	r25, 0x00	; 0
- 14c:	20 e2       	ldi	r18, 0x20	; 32
- 14e:	fc 01       	movw	r30, r24
- 150:	20 83       	st	Z, r18
- 152:	81 ec       	ldi	r24, 0xC1	; 193
- 154:	90 e0       	ldi	r25, 0x00	; 0
- 156:	28 e1       	ldi	r18, 0x18	; 24
- 158:	fc 01       	movw	r30, r24
- 15a:	20 83       	st	Z, r18
- 15c:	82 ec       	ldi	r24, 0xC2	; 194
- 15e:	90 e0       	ldi	r25, 0x00	; 0
- 160:	26 e0       	ldi	r18, 0x06	; 6
- 162:	fc 01       	movw	r30, r24
- 164:	20 83       	st	Z, r18
- 166:	84 ec       	ldi	r24, 0xC4	; 196
- 168:	90 e0       	ldi	r25, 0x00	; 0
- 16a:	27 e6       	ldi	r18, 0x67	; 103
- 16c:	30 e0       	ldi	r19, 0x00	; 0
- 16e:	fc 01       	movw	r30, r24
- 170:	31 83       	std	Z+1, r19	; 0x01
- 172:	20 83       	st	Z, r18
- 174:	2f c0       	rjmp	.+94     	; 0x1d4 <EnableUART+0xc0>
- 176:	88 ec       	ldi	r24, 0xC8	; 200
- 178:	90 e0       	ldi	r25, 0x00	; 0
- 17a:	20 e2       	ldi	r18, 0x20	; 32
- 17c:	fc 01       	movw	r30, r24
- 17e:	20 83       	st	Z, r18
- 180:	89 ec       	ldi	r24, 0xC9	; 201
- 182:	90 e0       	ldi	r25, 0x00	; 0
- 184:	28 e1       	ldi	r18, 0x18	; 24
- 186:	fc 01       	movw	r30, r24
- 188:	20 83       	st	Z, r18
- 18a:	8a ec       	ldi	r24, 0xCA	; 202
- 18c:	90 e0       	ldi	r25, 0x00	; 0
- 18e:	26 e0       	ldi	r18, 0x06	; 6
- 190:	fc 01       	movw	r30, r24
- 192:	20 83       	st	Z, r18
- 194:	8c ec       	ldi	r24, 0xCC	; 204
- 196:	90 e0       	ldi	r25, 0x00	; 0
- 198:	27 e6       	ldi	r18, 0x67	; 103
- 19a:	30 e0       	ldi	r19, 0x00	; 0
- 19c:	fc 01       	movw	r30, r24
- 19e:	31 83       	std	Z+1, r19	; 0x01
- 1a0:	20 83       	st	Z, r18
- 1a2:	18 c0       	rjmp	.+48     	; 0x1d4 <EnableUART+0xc0>
- 1a4:	80 ed       	ldi	r24, 0xD0	; 208
- 1a6:	90 e0       	ldi	r25, 0x00	; 0
- 1a8:	20 e2       	ldi	r18, 0x20	; 32
- 1aa:	fc 01       	movw	r30, r24
- 1ac:	20 83       	st	Z, r18
- 1ae:	81 ed       	ldi	r24, 0xD1	; 209
- 1b0:	90 e0       	ldi	r25, 0x00	; 0
- 1b2:	28 e1       	ldi	r18, 0x18	; 24
- 1b4:	fc 01       	movw	r30, r24
- 1b6:	20 83       	st	Z, r18
- 1b8:	82 ed       	ldi	r24, 0xD2	; 210
- 1ba:	90 e0       	ldi	r25, 0x00	; 0
- 1bc:	26 e0       	ldi	r18, 0x06	; 6
- 1be:	fc 01       	movw	r30, r24
- 1c0:	20 83       	st	Z, r18
- 1c2:	84 ed       	ldi	r24, 0xD4	; 212
- 1c4:	90 e0       	ldi	r25, 0x00	; 0
- 1c6:	27 e6       	ldi	r18, 0x67	; 103
- 1c8:	30 e0       	ldi	r19, 0x00	; 0
- 1ca:	fc 01       	movw	r30, r24
- 1cc:	31 83       	std	Z+1, r19	; 0x01
- 1ce:	20 83       	st	Z, r18
- 1d0:	01 c0       	rjmp	.+2      	; 0x1d4 <EnableUART+0xc0>
- 1d2:	00 00       	nop
- 1d4:	00 00       	nop
- 1d6:	0f 90       	pop	r0
- 1d8:	0f 90       	pop	r0
- 1da:	df 91       	pop	r29
- 1dc:	cf 91       	pop	r28
+
+
+unsigned char CharReady(int uartNum){
+	switch(uartNum)
+ 184:	00 97       	sbiw	r24, 0x00	; 0
+ 186:	19 f0       	breq	.+6      	; 0x18e <CharReady+0xa>
+ 188:	01 97       	sbiw	r24, 0x01	; 1
+ 18a:	29 f0       	breq	.+10     	; 0x196 <CharReady+0x12>
+ 18c:	08 c0       	rjmp	.+16     	; 0x19e <CharReady+0x1a>
+	{
+		case 0:
+		return UCSR0A & (1<<7);		
+ 18e:	80 91 c0 00 	lds	r24, 0x00C0	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7000c0>
+ 192:	80 78       	andi	r24, 0x80	; 128
+ 194:	08 95       	ret
+		break;
+		
+		case 1:
+		return UCSR1A & (1<<7);
+ 196:	80 91 c8 00 	lds	r24, 0x00C8	; 0x8000c8 <__TEXT_REGION_LENGTH__+0x7000c8>
+ 19a:	80 78       	andi	r24, 0x80	; 128
+ 19c:	08 95       	ret
+		break;
+		
+		default:
+		break;
+	}
+	return 0;
+ 19e:	80 e0       	ldi	r24, 0x00	; 0
+}
+ 1a0:	08 95       	ret
+
+000001a2 <ReadChar>:
+
+
+char ReadChar(int uartNum)
+{	
+	switch(uartNum)
+ 1a2:	81 30       	cpi	r24, 0x01	; 1
+ 1a4:	91 05       	cpc	r25, r1
+ 1a6:	61 f0       	breq	.+24     	; 0x1c0 <ReadChar+0x1e>
+ 1a8:	82 30       	cpi	r24, 0x02	; 2
+ 1aa:	91 05       	cpc	r25, r1
+ 1ac:	81 f0       	breq	.+32     	; 0x1ce <ReadChar+0x2c>
+ 1ae:	89 2b       	or	r24, r25
+ 1b0:	a9 f4       	brne	.+42     	; 0x1dc <ReadChar+0x3a>
+	{
+		case 0:
+			while ( (UCSR0A & (1<<7)) == 0 )
+ 1b2:	80 91 c0 00 	lds	r24, 0x00C0	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7000c0>
+ 1b6:	88 23       	and	r24, r24
+ 1b8:	e4 f7       	brge	.-8      	; 0x1b2 <ReadChar+0x10>
+			{}
+			return UDR0;
+ 1ba:	80 91 c6 00 	lds	r24, 0x00C6	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7000c6>
+ 1be:	08 95       	ret
+			break;
+			
+		case 1:
+			while ( (UCSR1A & (1<<7)) == 0 )
+ 1c0:	80 91 c8 00 	lds	r24, 0x00C8	; 0x8000c8 <__TEXT_REGION_LENGTH__+0x7000c8>
+ 1c4:	88 23       	and	r24, r24
+ 1c6:	e4 f7       	brge	.-8      	; 0x1c0 <ReadChar+0x1e>
+			{}
+			return UDR1;
+ 1c8:	80 91 ce 00 	lds	r24, 0x00CE	; 0x8000ce <__TEXT_REGION_LENGTH__+0x7000ce>
+ 1cc:	08 95       	ret
+			break;
+			
+		case 2:
+			while ( (UCSR2A & (1<<7)) == 0 )
+ 1ce:	80 91 d0 00 	lds	r24, 0x00D0	; 0x8000d0 <__TEXT_REGION_LENGTH__+0x7000d0>
+ 1d2:	88 23       	and	r24, r24
+ 1d4:	e4 f7       	brge	.-8      	; 0x1ce <ReadChar+0x2c>
+			{}
+			return UDR2;
+ 1d6:	80 91 d6 00 	lds	r24, 0x00D6	; 0x8000d6 <__TEXT_REGION_LENGTH__+0x7000d6>
+ 1da:	08 95       	ret
+			break;
+			
+		default:
+			break;		
+	}
+	return 0;	
+ 1dc:	80 e0       	ldi	r24, 0x00	; 0
+}
  1de:	08 95       	ret
 
-000001e0 <ReadChar>:
- 1e0:	cf 93       	push	r28
- 1e2:	df 93       	push	r29
- 1e4:	1f 92       	push	r1
- 1e6:	1f 92       	push	r1
- 1e8:	cd b7       	in	r28, 0x3d	; 61
- 1ea:	de b7       	in	r29, 0x3e	; 62
- 1ec:	9a 83       	std	Y+2, r25	; 0x02
- 1ee:	89 83       	std	Y+1, r24	; 0x01
- 1f0:	89 81       	ldd	r24, Y+1	; 0x01
- 1f2:	9a 81       	ldd	r25, Y+2	; 0x02
- 1f4:	81 30       	cpi	r24, 0x01	; 1
- 1f6:	91 05       	cpc	r25, r1
- 1f8:	a1 f0       	breq	.+40     	; 0x222 <ReadChar+0x42>
- 1fa:	82 30       	cpi	r24, 0x02	; 2
- 1fc:	91 05       	cpc	r25, r1
- 1fe:	e9 f0       	breq	.+58     	; 0x23a <ReadChar+0x5a>
- 200:	89 2b       	or	r24, r25
- 202:	19 f0       	breq	.+6      	; 0x20a <ReadChar+0x2a>
- 204:	00 00       	nop
- 206:	80 e0       	ldi	r24, 0x00	; 0
- 208:	23 c0       	rjmp	.+70     	; 0x250 <ReadChar+0x70>
- 20a:	00 00       	nop
- 20c:	80 ec       	ldi	r24, 0xC0	; 192
- 20e:	90 e0       	ldi	r25, 0x00	; 0
- 210:	fc 01       	movw	r30, r24
- 212:	80 81       	ld	r24, Z
- 214:	88 23       	and	r24, r24
- 216:	d4 f7       	brge	.-12     	; 0x20c <ReadChar+0x2c>
- 218:	86 ec       	ldi	r24, 0xC6	; 198
- 21a:	90 e0       	ldi	r25, 0x00	; 0
- 21c:	fc 01       	movw	r30, r24
- 21e:	80 81       	ld	r24, Z
- 220:	17 c0       	rjmp	.+46     	; 0x250 <ReadChar+0x70>
- 222:	00 00       	nop
- 224:	88 ec       	ldi	r24, 0xC8	; 200
- 226:	90 e0       	ldi	r25, 0x00	; 0
- 228:	fc 01       	movw	r30, r24
- 22a:	80 81       	ld	r24, Z
- 22c:	88 23       	and	r24, r24
- 22e:	d4 f7       	brge	.-12     	; 0x224 <ReadChar+0x44>
- 230:	8e ec       	ldi	r24, 0xCE	; 206
- 232:	90 e0       	ldi	r25, 0x00	; 0
- 234:	fc 01       	movw	r30, r24
- 236:	80 81       	ld	r24, Z
- 238:	0b c0       	rjmp	.+22     	; 0x250 <ReadChar+0x70>
- 23a:	00 00       	nop
- 23c:	80 ed       	ldi	r24, 0xD0	; 208
- 23e:	90 e0       	ldi	r25, 0x00	; 0
- 240:	fc 01       	movw	r30, r24
- 242:	80 81       	ld	r24, Z
- 244:	88 23       	and	r24, r24
- 246:	d4 f7       	brge	.-12     	; 0x23c <ReadChar+0x5c>
- 248:	86 ed       	ldi	r24, 0xD6	; 214
- 24a:	90 e0       	ldi	r25, 0x00	; 0
- 24c:	fc 01       	movw	r30, r24
- 24e:	80 81       	ld	r24, Z
- 250:	0f 90       	pop	r0
- 252:	0f 90       	pop	r0
- 254:	df 91       	pop	r29
- 256:	cf 91       	pop	r28
- 258:	08 95       	ret
+000001e0 <SendChar>:
 
-0000025a <SendChar>:
- 25a:	cf 93       	push	r28
- 25c:	df 93       	push	r29
- 25e:	00 d0       	rcall	.+0      	; 0x260 <SendChar+0x6>
- 260:	cd b7       	in	r28, 0x3d	; 61
- 262:	de b7       	in	r29, 0x3e	; 62
- 264:	9a 83       	std	Y+2, r25	; 0x02
- 266:	89 83       	std	Y+1, r24	; 0x01
- 268:	6b 83       	std	Y+3, r22	; 0x03
- 26a:	89 81       	ldd	r24, Y+1	; 0x01
- 26c:	9a 81       	ldd	r25, Y+2	; 0x02
- 26e:	81 30       	cpi	r24, 0x01	; 1
- 270:	91 05       	cpc	r25, r1
- 272:	b9 f0       	breq	.+46     	; 0x2a2 <SendChar+0x48>
- 274:	82 30       	cpi	r24, 0x02	; 2
- 276:	91 05       	cpc	r25, r1
- 278:	29 f1       	breq	.+74     	; 0x2c4 <SendChar+0x6a>
- 27a:	89 2b       	or	r24, r25
- 27c:	09 f0       	breq	.+2      	; 0x280 <SendChar+0x26>
- 27e:	33 c0       	rjmp	.+102    	; 0x2e6 <SendChar+0x8c>
- 280:	00 00       	nop
- 282:	80 ec       	ldi	r24, 0xC0	; 192
- 284:	90 e0       	ldi	r25, 0x00	; 0
- 286:	fc 01       	movw	r30, r24
- 288:	80 81       	ld	r24, Z
- 28a:	88 2f       	mov	r24, r24
- 28c:	90 e0       	ldi	r25, 0x00	; 0
- 28e:	80 72       	andi	r24, 0x20	; 32
- 290:	99 27       	eor	r25, r25
- 292:	89 2b       	or	r24, r25
- 294:	b1 f3       	breq	.-20     	; 0x282 <SendChar+0x28>
- 296:	86 ec       	ldi	r24, 0xC6	; 198
- 298:	90 e0       	ldi	r25, 0x00	; 0
- 29a:	2b 81       	ldd	r18, Y+3	; 0x03
- 29c:	fc 01       	movw	r30, r24
- 29e:	20 83       	st	Z, r18
- 2a0:	22 c0       	rjmp	.+68     	; 0x2e6 <SendChar+0x8c>
- 2a2:	00 00       	nop
- 2a4:	88 ec       	ldi	r24, 0xC8	; 200
- 2a6:	90 e0       	ldi	r25, 0x00	; 0
- 2a8:	fc 01       	movw	r30, r24
- 2aa:	80 81       	ld	r24, Z
- 2ac:	88 2f       	mov	r24, r24
- 2ae:	90 e0       	ldi	r25, 0x00	; 0
- 2b0:	80 72       	andi	r24, 0x20	; 32
- 2b2:	99 27       	eor	r25, r25
- 2b4:	89 2b       	or	r24, r25
- 2b6:	b1 f3       	breq	.-20     	; 0x2a4 <SendChar+0x4a>
- 2b8:	8e ec       	ldi	r24, 0xCE	; 206
- 2ba:	90 e0       	ldi	r25, 0x00	; 0
- 2bc:	2b 81       	ldd	r18, Y+3	; 0x03
- 2be:	fc 01       	movw	r30, r24
- 2c0:	20 83       	st	Z, r18
- 2c2:	11 c0       	rjmp	.+34     	; 0x2e6 <SendChar+0x8c>
- 2c4:	00 00       	nop
- 2c6:	80 ed       	ldi	r24, 0xD0	; 208
- 2c8:	90 e0       	ldi	r25, 0x00	; 0
- 2ca:	fc 01       	movw	r30, r24
- 2cc:	80 81       	ld	r24, Z
- 2ce:	88 2f       	mov	r24, r24
- 2d0:	90 e0       	ldi	r25, 0x00	; 0
- 2d2:	80 72       	andi	r24, 0x20	; 32
- 2d4:	99 27       	eor	r25, r25
- 2d6:	89 2b       	or	r24, r25
- 2d8:	b1 f3       	breq	.-20     	; 0x2c6 <SendChar+0x6c>
- 2da:	86 ed       	ldi	r24, 0xD6	; 214
- 2dc:	90 e0       	ldi	r25, 0x00	; 0
- 2de:	2b 81       	ldd	r18, Y+3	; 0x03
- 2e0:	fc 01       	movw	r30, r24
- 2e2:	20 83       	st	Z, r18
- 2e4:	00 00       	nop
- 2e6:	00 00       	nop
- 2e8:	0f 90       	pop	r0
- 2ea:	0f 90       	pop	r0
- 2ec:	0f 90       	pop	r0
- 2ee:	df 91       	pop	r29
- 2f0:	cf 91       	pop	r28
- 2f2:	08 95       	ret
+//// Modified from uart.c from BB.
+void SendChar(int uartNum, char c)
+{
+	switch(uartNum)
+ 1e0:	81 30       	cpi	r24, 0x01	; 1
+ 1e2:	91 05       	cpc	r25, r1
+ 1e4:	61 f0       	breq	.+24     	; 0x1fe <SendChar+0x1e>
+ 1e6:	82 30       	cpi	r24, 0x02	; 2
+ 1e8:	91 05       	cpc	r25, r1
+ 1ea:	81 f0       	breq	.+32     	; 0x20c <SendChar+0x2c>
+ 1ec:	89 2b       	or	r24, r25
+ 1ee:	a1 f4       	brne	.+40     	; 0x218 <SendChar+0x38>
+	{
+		case 0:
+			// Wait for transmitter register empty (ready for new character)
+			while ( (UCSR0A & (1<<5)) == 0 )
+ 1f0:	80 91 c0 00 	lds	r24, 0x00C0	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7000c0>
+ 1f4:	85 ff       	sbrs	r24, 5
+ 1f6:	fc cf       	rjmp	.-8      	; 0x1f0 <SendChar+0x10>
+			{}
+			// Then send the character
+			UDR0 = c;
+ 1f8:	60 93 c6 00 	sts	0x00C6, r22	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7000c6>
+			break;
+ 1fc:	08 95       	ret
+			
+		case 1:
+			// Wait for transmitter register empty (ready for new character)
+			while ( (UCSR1A & (1<<5)) == 0 )
+ 1fe:	80 91 c8 00 	lds	r24, 0x00C8	; 0x8000c8 <__TEXT_REGION_LENGTH__+0x7000c8>
+ 202:	85 ff       	sbrs	r24, 5
+ 204:	fc cf       	rjmp	.-8      	; 0x1fe <SendChar+0x1e>
+			{}
+			// Then send the character
+			UDR1 = c;
+ 206:	60 93 ce 00 	sts	0x00CE, r22	; 0x8000ce <__TEXT_REGION_LENGTH__+0x7000ce>
+			break;
+ 20a:	08 95       	ret
+			
+		case 2:
+			// Wait for transmitter register empty (ready for new character)
+			while ( (UCSR2A & (1<<5)) == 0 )
+ 20c:	80 91 d0 00 	lds	r24, 0x00D0	; 0x8000d0 <__TEXT_REGION_LENGTH__+0x7000d0>
+ 210:	85 ff       	sbrs	r24, 5
+ 212:	fc cf       	rjmp	.-8      	; 0x20c <SendChar+0x2c>
+			{}
+			// Then send the character
+			UDR2 = c;
+ 214:	60 93 d6 00 	sts	0x00D6, r22	; 0x8000d6 <__TEXT_REGION_LENGTH__+0x7000d6>
+ 218:	08 95       	ret
 
-000002f4 <SendString>:
+0000021a <SendString>:
 
 
 
 // Modified code from uart.c from BB.
 void SendString(int uartNum, char* str)
 {
- 2f4:	cf 93       	push	r28
- 2f6:	df 93       	push	r29
- 2f8:	00 d0       	rcall	.+0      	; 0x2fa <SendString+0x6>
- 2fa:	1f 92       	push	r1
- 2fc:	cd b7       	in	r28, 0x3d	; 61
- 2fe:	de b7       	in	r29, 0x3e	; 62
- 300:	9a 83       	std	Y+2, r25	; 0x02
- 302:	89 83       	std	Y+1, r24	; 0x01
- 304:	7c 83       	std	Y+4, r23	; 0x04
- 306:	6b 83       	std	Y+3, r22	; 0x03
+ 21a:	0f 93       	push	r16
+ 21c:	1f 93       	push	r17
+ 21e:	cf 93       	push	r28
+ 220:	df 93       	push	r29
+ 222:	8c 01       	movw	r16, r24
+ 224:	eb 01       	movw	r28, r22
 	while(*str != 0)
- 308:	0d c0       	rjmp	.+26     	; 0x324 <SendString+0x30>
+ 226:	03 c0       	rjmp	.+6      	; 0x22e <SendString+0x14>
 	{
 		// Send the character pointed to by "Streng"
 		SendChar(uartNum, *str);
- 30a:	8b 81       	ldd	r24, Y+3	; 0x03
- 30c:	9c 81       	ldd	r25, Y+4	; 0x04
- 30e:	fc 01       	movw	r30, r24
- 310:	20 81       	ld	r18, Z
- 312:	89 81       	ldd	r24, Y+1	; 0x01
- 314:	9a 81       	ldd	r25, Y+2	; 0x02
- 316:	62 2f       	mov	r22, r18
- 318:	a0 df       	rcall	.-192    	; 0x25a <SendChar>
+ 228:	c8 01       	movw	r24, r16
+ 22a:	da df       	rcall	.-76     	; 0x1e0 <SendChar>
 		// Advance the pointer one step
 		str++;			
- 31a:	8b 81       	ldd	r24, Y+3	; 0x03
- 31c:	9c 81       	ldd	r25, Y+4	; 0x04
- 31e:	01 96       	adiw	r24, 0x01	; 1
- 320:	9c 83       	std	Y+4, r25	; 0x04
- 322:	8b 83       	std	Y+3, r24	; 0x03
+ 22c:	21 96       	adiw	r28, 0x01	; 1
 
 
 // Modified code from uart.c from BB.
 void SendString(int uartNum, char* str)
 {
 	while(*str != 0)
- 324:	8b 81       	ldd	r24, Y+3	; 0x03
- 326:	9c 81       	ldd	r25, Y+4	; 0x04
- 328:	fc 01       	movw	r30, r24
- 32a:	80 81       	ld	r24, Z
- 32c:	88 23       	and	r24, r24
- 32e:	69 f7       	brne	.-38     	; 0x30a <SendString+0x16>
+ 22e:	68 81       	ld	r22, Y
+ 230:	61 11       	cpse	r22, r1
+ 232:	fa cf       	rjmp	.-12     	; 0x228 <SendString+0xe>
 		// Send the character pointed to by "Streng"
 		SendChar(uartNum, *str);
 		// Advance the pointer one step
 		str++;			
 	}	
- 330:	00 00       	nop
- 332:	0f 90       	pop	r0
- 334:	0f 90       	pop	r0
- 336:	0f 90       	pop	r0
- 338:	0f 90       	pop	r0
- 33a:	df 91       	pop	r29
- 33c:	cf 91       	pop	r28
- 33e:	08 95       	ret
+}
+ 234:	df 91       	pop	r29
+ 236:	cf 91       	pop	r28
+ 238:	1f 91       	pop	r17
+ 23a:	0f 91       	pop	r16
+ 23c:	08 95       	ret
 
-00000340 <main>:
-#define F_CPU 16000000
+0000023e <sendATcommand>:
 
-#define databits 8
-#define INPUT_MAX 255
+void sendATcommand(char* ATcommand, char* response, int selected_UART, char* expectedResult)//, char* expected_answer, unsigned int timeout)
+{				
+ 23e:	af 92       	push	r10
+ 240:	bf 92       	push	r11
+ 242:	cf 92       	push	r12
+ 244:	df 92       	push	r13
+ 246:	ef 92       	push	r14
+ 248:	ff 92       	push	r15
+ 24a:	0f 93       	push	r16
+ 24c:	1f 93       	push	r17
+ 24e:	cf 93       	push	r28
+ 250:	df 93       	push	r29
+ 252:	cd b7       	in	r28, 0x3d	; 61
+ 254:	de b7       	in	r29, 0x3e	; 62
+ 256:	cf 5f       	subi	r28, 0xFF	; 255
+ 258:	d1 09       	sbc	r29, r1
+ 25a:	0f b6       	in	r0, 0x3f	; 63
+ 25c:	f8 94       	cli
+ 25e:	de bf       	out	0x3e, r29	; 62
+ 260:	0f be       	out	0x3f, r0	; 63
+ 262:	cd bf       	out	0x3d, r28	; 61
+ 264:	7c 01       	movw	r14, r24
+ 266:	6b 01       	movw	r12, r22
+ 268:	8a 01       	movw	r16, r20
+ 26a:	59 01       	movw	r10, r18
+	// Clean inputbuffer
+	while(CharReady(selected_UART))
+ 26c:	02 c0       	rjmp	.+4      	; 0x272 <sendATcommand+0x34>
+	{
+		ReadChar(selected_UART);
+ 26e:	c8 01       	movw	r24, r16
+ 270:	98 df       	rcall	.-208    	; 0x1a2 <ReadChar>
+}
 
-int main(){
- 340:	cf 93       	push	r28
- 342:	df 93       	push	r29
- 344:	1f 92       	push	r1
- 346:	cd b7       	in	r28, 0x3d	; 61
- 348:	de b7       	in	r29, 0x3e	; 62
-	//InitUART(myUART, baud, databits, 'N');
-	//InitUART(UART_PC, 112500, 8, 'N'); // 9600
-	//InitUART(UART_GSM, 112500, 8, 'N');
-	//InitUART(UART_TEST, 112500, 8, 'N');
+void sendATcommand(char* ATcommand, char* response, int selected_UART, char* expectedResult)//, char* expected_answer, unsigned int timeout)
+{				
+	// Clean inputbuffer
+	while(CharReady(selected_UART))
+ 272:	c8 01       	movw	r24, r16
+ 274:	87 df       	rcall	.-242    	; 0x184 <CharReady>
+ 276:	81 11       	cpse	r24, r1
+ 278:	fa cf       	rjmp	.-12     	; 0x26e <sendATcommand+0x30>
+	{
+		ReadChar(selected_UART);
+	}
 	
-	EnableUART(UART_PC);
+	// Concatenate command with newline.
+	char AT_command_buf[255] = "";
+ 27a:	1a 82       	std	Y+2, r1	; 0x02
+ 27c:	19 82       	std	Y+1, r1	; 0x01
+ 27e:	fe 01       	movw	r30, r28
+ 280:	33 96       	adiw	r30, 0x03	; 3
+ 282:	8d ef       	ldi	r24, 0xFD	; 253
+ 284:	df 01       	movw	r26, r30
+ 286:	1d 92       	st	X+, r1
+ 288:	8a 95       	dec	r24
+ 28a:	e9 f7       	brne	.-6      	; 0x286 <sendATcommand+0x48>
+	strcpy(AT_command_buf,ATcommand);
+ 28c:	b7 01       	movw	r22, r14
+ 28e:	ce 01       	movw	r24, r28
+ 290:	01 96       	adiw	r24, 0x01	; 1
+ 292:	7c 01       	movw	r14, r24
+ 294:	76 d0       	rcall	.+236    	; 0x382 <strcpy>
+	strcat(AT_command_buf, "\r\n\0");
+ 296:	f7 01       	movw	r30, r14
+ 298:	01 90       	ld	r0, Z+
+ 29a:	00 20       	and	r0, r0
+ 29c:	e9 f7       	brne	.-6      	; 0x298 <sendATcommand+0x5a>
+ 29e:	31 97       	sbiw	r30, 0x01	; 1
+ 2a0:	8d e0       	ldi	r24, 0x0D	; 13
+ 2a2:	9a e0       	ldi	r25, 0x0A	; 10
+ 2a4:	91 83       	std	Z+1, r25	; 0x01
+ 2a6:	80 83       	st	Z, r24
+	SendString(selected_UART, AT_command_buf);
+ 2a8:	12 82       	std	Z+2, r1	; 0x02
+ 2aa:	b7 01       	movw	r22, r14
+ 2ac:	c8 01       	movw	r24, r16
+	
+			
+	int i = 0;
+ 2ae:	b5 df       	rcall	.-150    	; 0x21a <SendString>
+ 2b0:	e1 2c       	mov	r14, r1
+	int elapsedms = 0;
+	char c;
+	//// this loop waits for the answer
+	do{
+		// if there are data in the UART input buffer, reads it and checks for the answer
+		if(CharReady(selected_UART))
+ 2b2:	f1 2c       	mov	r15, r1
+ 2b4:	c8 01       	movw	r24, r16
+ 2b6:	66 df       	rcall	.-308    	; 0x184 <CharReady>
+ 2b8:	88 23       	and	r24, r24
+		{						
+			c = ReadChar(selected_UART);
+ 2ba:	e1 f3       	breq	.-8      	; 0x2b4 <sendATcommand+0x76>
+ 2bc:	c8 01       	movw	r24, r16
+ 2be:	71 df       	rcall	.-286    	; 0x1a2 <ReadChar>
+			response[i] = c;
+ 2c0:	f6 01       	movw	r30, r12
+ 2c2:	ee 0d       	add	r30, r14
+ 2c4:	ff 1d       	adc	r31, r15
+			i++;
+ 2c6:	80 83       	st	Z, r24
+ 2c8:	9f ef       	ldi	r25, 0xFF	; 255
+ 2ca:	e9 1a       	sub	r14, r25
+
+			// Check if expected result is somewhere in the response.			
+			if(strstr(response, expectedResult) != NULL){				
+ 2cc:	f9 0a       	sbc	r15, r25
+ 2ce:	b5 01       	movw	r22, r10
+ 2d0:	c6 01       	movw	r24, r12
+ 2d2:	5e d0       	rcall	.+188    	; 0x390 <strstr>
+ 2d4:	89 2b       	or	r24, r25
+ 2d6:	71 f3       	breq	.-36     	; 0x2b4 <sendATcommand+0x76>
+			//}
+		}
+		// Waits for the answer with time out
+	}
+	while(1);	
+ 2d8:	c1 50       	subi	r28, 0x01	; 1
+ 2da:	df 4f       	sbci	r29, 0xFF	; 255
+ 2dc:	0f b6       	in	r0, 0x3f	; 63
+ 2de:	f8 94       	cli
+ 2e0:	de bf       	out	0x3e, r29	; 62
+ 2e2:	0f be       	out	0x3f, r0	; 63
+ 2e4:	cd bf       	out	0x3d, r28	; 61
+ 2e6:	df 91       	pop	r29
+ 2e8:	cf 91       	pop	r28
+ 2ea:	1f 91       	pop	r17
+ 2ec:	0f 91       	pop	r16
+ 2ee:	ff 90       	pop	r15
+ 2f0:	ef 90       	pop	r14
+ 2f2:	df 90       	pop	r13
+ 2f4:	cf 90       	pop	r12
+ 2f6:	bf 90       	pop	r11
+ 2f8:	af 90       	pop	r10
+ 2fa:	08 95       	ret
+
+000002fc <main>:
+////Author: Johannes
+
+#include "project_definitions.h"
+
+int main()
+{
+ 2fc:	cf 93       	push	r28
+ 2fe:	df 93       	push	r29
+ 300:	cd b7       	in	r28, 0x3d	; 61
+ 302:	de b7       	in	r29, 0x3e	; 62
+ 304:	cf 5f       	subi	r28, 0xFF	; 255
+ 306:	d1 09       	sbc	r29, r1
+ 308:	0f b6       	in	r0, 0x3f	; 63
+ 30a:	f8 94       	cli
+ 30c:	de bf       	out	0x3e, r29	; 62
+ 30e:	0f be       	out	0x3f, r0	; 63
+ 310:	cd bf       	out	0x3d, r28	; 61
+	Setup();
+ 312:	2b d0       	rcall	.+86     	; 0x36a <Setup>
+	char buf[255] = "";	
+ 314:	1a 82       	std	Y+2, r1	; 0x02
+ 316:	19 82       	std	Y+1, r1	; 0x01
+ 318:	fe 01       	movw	r30, r28
+ 31a:	33 96       	adiw	r30, 0x03	; 3
+ 31c:	8d ef       	ldi	r24, 0xFD	; 253
+ 31e:	df 01       	movw	r26, r30
+ 320:	1d 92       	st	X+, r1
+ 322:	8a 95       	dec	r24
+ 324:	e9 f7       	brne	.-6      	; 0x320 <main+0x24>
+	SendString(UART_PC, "TEST START.\r\n");	
+ 326:	60 e0       	ldi	r22, 0x00	; 0
+ 328:	72 e0       	ldi	r23, 0x02	; 2
+ 32a:	80 e0       	ldi	r24, 0x00	; 0
+ 32c:	90 e0       	ldi	r25, 0x00	; 0
+ 32e:	75 df       	rcall	.-278    	; 0x21a <SendString>
+	sendATcommand("AT", buf, UART_GSM, "OK");
+ 330:	2e e0       	ldi	r18, 0x0E	; 14
+ 332:	32 e0       	ldi	r19, 0x02	; 2
+ 334:	41 e0       	ldi	r20, 0x01	; 1
+ 336:	50 e0       	ldi	r21, 0x00	; 0
+ 338:	be 01       	movw	r22, r28
+ 33a:	6f 5f       	subi	r22, 0xFF	; 255
+ 33c:	7f 4f       	sbci	r23, 0xFF	; 255
+ 33e:	81 e1       	ldi	r24, 0x11	; 17
+ 340:	92 e0       	ldi	r25, 0x02	; 2
+ 342:	7d df       	rcall	.-262    	; 0x23e <sendATcommand>
+	
+	SendString(UART_PC, buf);
+ 344:	be 01       	movw	r22, r28
+ 346:	6f 5f       	subi	r22, 0xFF	; 255
+ 348:	7f 4f       	sbci	r23, 0xFF	; 255
  34a:	80 e0       	ldi	r24, 0x00	; 0
  34c:	90 e0       	ldi	r25, 0x00	; 0
- 34e:	e2 de       	rcall	.-572    	; 0x114 <EnableUART>
-	EnableUART(UART_GSM);
- 350:	81 e0       	ldi	r24, 0x01	; 1
- 352:	90 e0       	ldi	r25, 0x00	; 0
- 354:	df de       	rcall	.-578    	; 0x114 <EnableUART>
-	EnableUART(UART_TEST);
- 356:	82 e0       	ldi	r24, 0x02	; 2
- 358:	90 e0       	ldi	r25, 0x00	; 0
- 35a:	dc de       	rcall	.-584    	; 0x114 <EnableUART>
-		//char c = ReadChar(0);
-		//SendChar(0, c);		
-	//}
-	
-	
-	SendString(UART_PC, "Starting GSM\r\n");
- 35c:	60 e0       	ldi	r22, 0x00	; 0
- 35e:	72 e0       	ldi	r23, 0x02	; 2
- 360:	80 e0       	ldi	r24, 0x00	; 0
- 362:	90 e0       	ldi	r25, 0x00	; 0
-	
+ 34e:	65 df       	rcall	.-310    	; 0x21a <SendString>
+	//SendString(UART_PC, "AT command has timed out.\r\n");
+	SendString(UART_PC, "Going to while loop\r\n");
+ 350:	64 e1       	ldi	r22, 0x14	; 20
+ 352:	72 e0       	ldi	r23, 0x02	; 2
+ 354:	80 e0       	ldi	r24, 0x00	; 0
+ 356:	90 e0       	ldi	r25, 0x00	; 0
 	while(1)
-	{
-		char c = ReadChar(UART_PC);
- 364:	c7 df       	rcall	.-114    	; 0x2f4 <SendString>
- 366:	80 e0       	ldi	r24, 0x00	; 0
- 368:	90 e0       	ldi	r25, 0x00	; 0
- 36a:	3a df       	rcall	.-396    	; 0x1e0 <ReadChar>
-		SendChar(UART_PC, c);
- 36c:	89 83       	std	Y+1, r24	; 0x01
- 36e:	69 81       	ldd	r22, Y+1	; 0x01
- 370:	80 e0       	ldi	r24, 0x00	; 0
- 372:	90 e0       	ldi	r25, 0x00	; 0
- 374:	72 df       	rcall	.-284    	; 0x25a <SendChar>
-	}
- 376:	f7 cf       	rjmp	.-18     	; 0x366 <main+0x26>
+	{	
+		char c = ReadChar(UART_GSM);	
+ 358:	60 df       	rcall	.-320    	; 0x21a <SendString>
+ 35a:	81 e0       	ldi	r24, 0x01	; 1
+ 35c:	90 e0       	ldi	r25, 0x00	; 0
+		SendChar(UART_PC, c);			
+ 35e:	21 df       	rcall	.-446    	; 0x1a2 <ReadChar>
+ 360:	68 2f       	mov	r22, r24
+ 362:	80 e0       	ldi	r24, 0x00	; 0
+ 364:	90 e0       	ldi	r25, 0x00	; 0
+ 366:	3c df       	rcall	.-392    	; 0x1e0 <SendChar>
+ 368:	f8 cf       	rjmp	.-16     	; 0x35a <main+0x5e>
 
-00000378 <_exit>:
- 378:	f8 94       	cli
+0000036a <Setup>:
+#include "waspmoteDriver.h"
 
-0000037a <__stop_program>:
- 37a:	ff cf       	rjmp	.-2      	; 0x37a <__stop_program>
+void Setup()
+{
+	// Set pin as output
+	DDRE = 0b11111111;	
+ 36a:	8f ef       	ldi	r24, 0xFF	; 255
+ 36c:	8d b9       	out	0x0d, r24	; 13
+	PORTE &= ~(1 << 4); 
+ 36e:	8e b1       	in	r24, 0x0e	; 14
+ 370:	8f 7e       	andi	r24, 0xEF	; 239
+ 372:	8e b9       	out	0x0e, r24	; 14
+	//PORTE |= (1 << 4);
+	EnableUART(UART_PC);
+ 374:	80 e0       	ldi	r24, 0x00	; 0
+ 376:	90 e0       	ldi	r25, 0x00	; 0
+ 378:	cd de       	rcall	.-614    	; 0x114 <EnableUART>
+	EnableUART(UART_GSM);	
+ 37a:	81 e0       	ldi	r24, 0x01	; 1
+ 37c:	90 e0       	ldi	r25, 0x00	; 0
+ 37e:	ca ce       	rjmp	.-620    	; 0x114 <EnableUART>
+ 380:	08 95       	ret
+
+00000382 <strcpy>:
+ 382:	fb 01       	movw	r30, r22
+ 384:	dc 01       	movw	r26, r24
+ 386:	01 90       	ld	r0, Z+
+ 388:	0d 92       	st	X+, r0
+ 38a:	00 20       	and	r0, r0
+ 38c:	e1 f7       	brne	.-8      	; 0x386 <strcpy+0x4>
+ 38e:	08 95       	ret
+
+00000390 <strstr>:
+ 390:	fb 01       	movw	r30, r22
+ 392:	51 91       	ld	r21, Z+
+ 394:	55 23       	and	r21, r21
+ 396:	a9 f0       	breq	.+42     	; 0x3c2 <strstr+0x32>
+ 398:	bf 01       	movw	r22, r30
+ 39a:	dc 01       	movw	r26, r24
+ 39c:	4d 91       	ld	r20, X+
+ 39e:	45 17       	cp	r20, r21
+ 3a0:	41 11       	cpse	r20, r1
+ 3a2:	e1 f7       	brne	.-8      	; 0x39c <strstr+0xc>
+ 3a4:	59 f4       	brne	.+22     	; 0x3bc <strstr+0x2c>
+ 3a6:	cd 01       	movw	r24, r26
+ 3a8:	01 90       	ld	r0, Z+
+ 3aa:	00 20       	and	r0, r0
+ 3ac:	49 f0       	breq	.+18     	; 0x3c0 <strstr+0x30>
+ 3ae:	4d 91       	ld	r20, X+
+ 3b0:	40 15       	cp	r20, r0
+ 3b2:	41 11       	cpse	r20, r1
+ 3b4:	c9 f3       	breq	.-14     	; 0x3a8 <strstr+0x18>
+ 3b6:	fb 01       	movw	r30, r22
+ 3b8:	41 11       	cpse	r20, r1
+ 3ba:	ef cf       	rjmp	.-34     	; 0x39a <strstr+0xa>
+ 3bc:	81 e0       	ldi	r24, 0x01	; 1
+ 3be:	90 e0       	ldi	r25, 0x00	; 0
+ 3c0:	01 97       	sbiw	r24, 0x01	; 1
+ 3c2:	08 95       	ret
+
+000003c4 <_exit>:
+ 3c4:	f8 94       	cli
+
+000003c6 <__stop_program>:
+ 3c6:	ff cf       	rjmp	.-2      	; 0x3c6 <__stop_program>

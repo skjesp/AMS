@@ -11,7 +11,7 @@
 #include "led.h"
 
 // Select the UART to test (UART0, UART1, UART2 or UART3)
-#define myUART UART0
+#define myUART UART1
 
 int main()
 {	
