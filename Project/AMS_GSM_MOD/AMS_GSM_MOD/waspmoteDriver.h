@@ -2,10 +2,15 @@
 #define WASP_DRIVER_H
 #include "project_definitions.h"
 void PowerOn();
-void PowerOff();
+void TogglerPower();
 void Setup();
 
 void SetupCountdown(unsigned int seconds);
 void StartCountdown();
 void CheckCountdown();
+void TestTimer();
+void TimerStart();
+int CheckTimeout();
+void TimerEnd();
+
 #endif

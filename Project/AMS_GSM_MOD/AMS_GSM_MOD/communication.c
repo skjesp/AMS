@@ -9,7 +9,7 @@
 #include "communication.h"
 #include <avr/io.h>
 #include <string.h>
-#include <util/delay.h>
+
 
 void EnableUART(int uartNum)
 {
@@ -90,7 +90,7 @@ char ReadChar(int uartNum)
 	return 0;	
 }
 
-//// Modified from uart.c from BB.
+// Modified from uart.c from BB.
 void SendChar(int uartNum, char c)
 {
 	switch(uartNum)
@@ -138,7 +138,7 @@ void SendString(int uartNum, char* str)
 	}	
 }
 
-void sendATcommand(char* ATcommand, char* response, int selected_UART, char* expectedResult)//, char* expected_answer, unsigned int timeout)
+int sendATcommand(char* ATcommand, int selected_UART, char* expectedResult)//, char* expected_answer, unsigned int timeout)
 {				
 	// Clean inputbuffer
 	while(CharReady(selected_UART))
@@ -151,13 +151,14 @@ void sendATcommand(char* ATcommand, char* response, int selected_UART, char* exp
 	strcpy(AT_command_buf,ATcommand);
 	strcat(AT_command_buf, "\r\n\0");
 	SendString(selected_UART, AT_command_buf);
-	
-			
-	int i = 0;
-	int elapsedms = 0;
+				
+	int i = 0;	
 	char c;
-	//// this loop waits for the answer
-	do{
+	TimerStart();
+	
+	char response [255] = "";
+	
+	while(1){
 		// if there are data in the UART input buffer, reads it and checks for the answer
 		if(CharReady(selected_UART))
 		{						
@@ -166,21 +167,28 @@ void sendATcommand(char* ATcommand, char* response, int selected_UART, char* exp
 			i++;
 
 			// Check if expected result is somewhere in the response.			
-			if(strstr(response, expectedResult) != NULL){				
-				return;
+			if(strstr(response, expectedResult) != NULL){
+				SendString(UART_PC, "Command \"");
+				SendString(UART_PC, ATcommand);
+				SendString(UART_PC, "\" was OK.\r\n");
+				return 0;
 			}
 		}
-		else
+		if(CheckTimeout())
 		{
-			//_delay_ms(1);
-			//elapsedms += 1;
-			//if(elapsedms > 1500)
-			//{
-				//SendString(UART_PC, "AT command has timed out.\r\n");				
-				//return;
-			//}
-		}
-		// Waits for the answer with time out
-	}
-	while(1);	
+			TimerEnd();
+			SendString(UART_PC, "AT command has timed out.\r\n");
+			if(strlen(response) > 1)
+			{
+				SendString(UART_PC, "Response was: ");
+				SendString(UART_PC, response);
+				SendString(UART_PC, "\r\n\0");
+			}
+			else
+			{
+				SendString(UART_PC, "No response received\r\n\0");
+			}
+			return -1;
+		}		
+	}	
 }

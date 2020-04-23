@@ -1,28 +1,35 @@
-////3G + GPS shield
-////
-////main.c
-////
-////Created: 07-04-2020 13:06:00
-////Author: Johannes
+//3G + GPS shield
+//
+//main.c
+//
+//Created: 07-04-2020 13:06:00
+//Author: Johannes
 
 #include "project_definitions.h"
 
 int main()
 {
-	Setup();
+	Setup();	
+	StartGSM();
+	
+	
+	
+	
+	while(1)
+	{
+		
+	}
+	
+	
 	char buf[255] = "";	
 	SendString(UART_PC, "TEST START.\r\n");	
-	sendATcommand("AT", buf, UART_GSM, "OK");
+	sendATcommand("AT", UART_GSM, "OK");
+	
+	sendATcommand("AT+CPIN=\"6913\"", UART_GSM, "OK");
+	sendATcommand("AT+CMGF=1", UART_GSM, "OK");
+	sendATcommand("AT+CMGS=\"+4523920863\"", UART_GSM, ">");	
 	
 	
-	// DO NOT DELETE!!
-	//sendATcommand("AT+CPIN\"6913\"", buf, UART_GSM, "OK");
-	//sendATcommand("AT+CMGF=1", buf, UART_GSM, "OK");
-	//sendATcommand("AT+CMGS=\"+4523920863\"", buf, UART_GSM, ">");
-	
-	
-	
-	//SendString(UART_PC, "AT command has timed out.\r\n");
 	SendString(UART_PC, "Going to while loop\r\n");
 	while(1)
 	{	

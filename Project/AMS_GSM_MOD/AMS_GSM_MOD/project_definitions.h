@@ -5,7 +5,7 @@
 #define UART_GSM 1
 #define UART_TEST 2
 
-#include <util/delay.h>
+
 #include <avr/io.h>
 #include <stdio.h>
 #include <string.h>
