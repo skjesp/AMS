@@ -10,18 +10,18 @@
 int main()
 {
 	Setup();	
-	StartGSM();
-	
-	
-	
-	
+	StartGSM();	
+	if(unlockSim("6913") != 0)
+	{
+		SendString(UART_PC, "Pin was wrong. Closing program\r\n");
+		return 1;
+	}
 	while(1)
 	{
 		
 	}
 	
-	
-	char buf[255] = "";	
+		
 	SendString(UART_PC, "TEST START.\r\n");	
 	sendATcommand("AT", UART_GSM, "OK");
 	

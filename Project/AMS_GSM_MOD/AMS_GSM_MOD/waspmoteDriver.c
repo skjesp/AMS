@@ -61,14 +61,18 @@ void TestTimer()
 // Note: Alternative power off by AT command
 void TogglerPower()
 {	
-	// Ensure that PowerOn pin is high.
+	// Set high
 	PORTE |= (1 << 4);
 	
 	TimerStart();
 	while(CheckTimeout()){};
 	TimerEnd();
 	
-	PORTE &= ~(1 << 4);	
+	PORTE &= ~(1 << 4);
+	
+	TimerStart();
+	while(CheckTimeout()){};
+	TimerEnd();
 }
 
 
@@ -88,7 +92,26 @@ void StartGSM()
 	}	
 }
 
-int unlockSim()
+int unlockSim(char* simCode)
 {	
-	//sendATcommand()
+	int res = sendATcommand("AT+CPIN?", UART_GSM, "SIM PIN");
+	if(res == 0)
+	{
+		SendString(UART_PC, "Unlocking SIM\r\n");
+		
+		char command[50] = "";
+		strcpy(command, "AT+CPIN=");
+		strcat(command, simCode);				
+		int pinRes = sendATcommand(command, UART_GSM, "READY");		
+		if(pinRes != 0)
+		{
+			SendString(UART_PC, "SIM not unlocked!\r\n");
+			return -1;
+		}
+	}
+	else
+	{
+		SendString(UART_PC, "SIM was already unlocked.\r\n");
+	}	
+	return 0;
 }
