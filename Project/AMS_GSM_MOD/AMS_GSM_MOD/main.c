@@ -17,7 +17,8 @@ int main()
 		return 1;
 	}
 	
-	SendSMS("testing SensSMS function.", "+4523920863");
+	// This function is OK
+	//SendSMS("testing SensSMS function.", "+4523920863");
 	//sendATcommand("AT+CMGF=1", UART_GSM, "OK");
 	//sendATcommand("AT+CMGS=\"+4523920863\"", UART_GSM, ">");	
 	

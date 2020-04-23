@@ -138,7 +138,7 @@ void SendString(int uartNum, char* str)
 	}	
 }
 
-int sendATcommand(char* ATcommand, int selected_UART, char* expectedResult)//, char* expected_answer, unsigned int timeout)
+int sendATcommand(char* ATcommand, int selected_UART, char* expectedResult, char* resultBuffer)
 {				
 	// Clean inputbuffer
 	while(CharReady(selected_UART))
@@ -168,6 +168,10 @@ int sendATcommand(char* ATcommand, int selected_UART, char* expectedResult)//, c
 
 			// Check if expected result is somewhere in the response.			
 			if(strstr(response, expectedResult) != NULL){
+				if(resultBuffer != NULL)
+				{
+					strcpy(resultBuffer, response);
+				}								
 				SendString(UART_PC, "Command \"");
 				SendString(UART_PC, ATcommand);
 				SendString(UART_PC, "\" was OK.\r\n");
@@ -192,3 +196,63 @@ int sendATcommand(char* ATcommand, int selected_UART, char* expectedResult)//, c
 		}		
 	}	
 }
+
+
+
+//int sendATGetCommand(char* ATcommand, int selected_UART, char* buffer)
+//{				
+	//// Clean inputbuffer
+	//while(CharReady(selected_UART))
+	//{
+		//ReadChar(selected_UART);
+	//}
+	//
+	//// Concatenate command with newline.
+	//char AT_command_buf[255] = "";
+	//strcpy(AT_command_buf,ATcommand);
+	//strcat(AT_command_buf, "\r\n\0");
+	//SendString(selected_UART, AT_command_buf);
+				//
+	//int i = 0;	
+	//char c;
+	//TimerStart();
+	//
+	//char response [255] = "";
+	//
+	//while(1){
+		//// if there are data in the UART input buffer, reads it and checks for the answer
+		//if(CharReady(selected_UART))
+		//{						
+			//c = ReadChar(selected_UART);
+			//buffer[i] = c;
+			//i++;
+//
+			//// Check if expected result is somewhere in the response.			
+			//if(strstr(buffer, "\r\nOK\r\n") != NULL){
+				//SendString(UART_PC, "Command \"");
+				//SendString(UART_PC, ATcommand);
+				//SendString(UART_PC, "\" was OK.\r\n");
+				//// terminate string.
+				//i++;
+				//buffer[i] = '\0';				
+				//return 0;
+			//}
+		//}
+		//if(CheckTimeout())
+		//{
+			//TimerEnd();
+			//SendString(UART_PC, "AT command has timed out.\r\n");
+			//if(strlen(response) > 1)
+			//{
+				//SendString(UART_PC, "Response was: ");
+				//SendString(UART_PC, response);
+				//SendString(UART_PC, "\r\n\0");
+			//}
+			//else
+			//{
+				//SendString(UART_PC, "No response received\r\n\0");
+			//}
+			//return -1;
+		//}		
+	//}	
+//}

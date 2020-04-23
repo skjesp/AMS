@@ -21,6 +21,10 @@ void Setup()
 	TCNT1 = 65536-(3*15625L); // 3 overflow each three seconds.
 	TCCR1A = 0b00000000;
 	//TCCR1B = 0b00000101; // Prescaler 1024	
+	
+	// Set preffered memory in simcard. 
+	// TODO: not utilizing return to anything.
+	sendATcommand("AT+CPMS=\"SM\",\"SM\",\"SM\"", UART_GSM, "OK", NULL);	
 }
 
 void TimerStart()
@@ -80,7 +84,7 @@ void TogglerPower()
 void StartGSM()
 {
 	SendString(UART_PC, "Checking if GSM module is powered.\r\n");	
-	int res = sendATcommand("AT", UART_GSM, "OK");
+	int res = sendATcommand("AT", UART_GSM, "OK", NULL);
 	if(res == 0)
 	{
 		SendString(UART_PC, "GSM module is already on.\r\n");	
@@ -88,13 +92,13 @@ void StartGSM()
 	while(res != 0)
 	{
 		TogglerPower(); // TODO: not waiting long enough to let gsm start
-		res = sendATcommand("AT", UART_GSM, "OK");		
+		res = sendATcommand("AT", UART_GSM, "OK", NULL);		
 	}	
 }
 
 int unlockSim(char* simCode)
 {	
-	int res = sendATcommand("AT+CPIN?", UART_GSM, "SIM PIN");
+	int res = sendATcommand("AT+CPIN?", UART_GSM, "SIM PIN", NULL);
 	if(res == 0)
 	{
 		SendString(UART_PC, "Unlocking SIM\r\n");
@@ -102,7 +106,7 @@ int unlockSim(char* simCode)
 		char command[50] = "";
 		strcpy(command, "AT+CPIN=");
 		strcat(command, simCode);				
-		int pinRes = sendATcommand(command, UART_GSM, "READY");		
+		int pinRes = sendATcommand(command, UART_GSM, "READY", NULL);		
 		if(pinRes != 0)
 		{
 			SendString(UART_PC, "SIM not unlocked!\r\n");
@@ -123,9 +127,26 @@ int SendSMS(char* message, char* phoneNumber)
 	char cmgs_comm [50] = "AT+CMGS=\"";
 	strcat(cmgs_comm, phoneNumber);
 	strcat(cmgs_comm, "\"");		
-	sendATcommand("AT+CMGF=1", UART_GSM, "OK");	
-	sendATcommand(cmgs_comm, UART_GSM, ">");
+	sendATcommand("AT+CMGF=1", UART_GSM, "OK", NULL);	
+	sendATcommand(cmgs_comm, UART_GSM, ">", NULL);
 	SendString(UART_GSM, message);
 	SendString(UART_GSM, "\x1A");	
+	return 0;
+}
+
+
+int ReadSMS()
+{
+	char unreadMessageBuffer[255] = "";	
+	SendString(UART_GSM, "AT+CMGL=\"REC UNREAD\"");
+	int res = sendATcommand("AT+CMGL=\"REC UNREAD\"", UART_GSM, "OK", unreadMessageBuffer);
+	if(res != 0)
+	{
+		SendString(UART_PC, "Something bad happened while reading SMS\r\n").		
+	}
+	
+	// Parse the received messages 
+	
+	
 	return 0;
 }
