@@ -115,3 +115,17 @@ int unlockSim(char* simCode)
 	}	
 	return 0;
 }
+
+
+
+int SendSMS(char* message, char* phoneNumber)
+{
+	char cmgs_comm [50] = "AT+CMGS=\"";
+	strcat(cmgs_comm, phoneNumber);
+	strcat(cmgs_comm, "\"");		
+	sendATcommand("AT+CMGF=1", UART_GSM, "OK");	
+	sendATcommand(cmgs_comm, UART_GSM, ">");
+	SendString(UART_GSM, message);
+	SendString(UART_GSM, "\x1A");	
+	return 0;
+}
