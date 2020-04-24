@@ -9,8 +9,9 @@
 
 int main()
 {
-	Setup();		
-	StartGSM();	
+	Setup();	
+	StartGSM();
+	
 	if(unlockSim("6913") != 0)
 	{
 		SendString(UART_PC, "Pin was wrong. Closing program\r\n");

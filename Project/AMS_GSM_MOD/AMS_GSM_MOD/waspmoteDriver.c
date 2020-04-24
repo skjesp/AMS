@@ -27,8 +27,18 @@ void Setup()
 	sendATcommand("AT+CPMS=\"SM\",\"SM\",\"SM\"", UART_GSM, "OK", NULL);	
 }
 
-void TimerStart()
+void TimerStart(unsigned int ms)
 {
+	// max allowed is 4096
+	if(ms > 4096){
+		ms = 1000; // default value will be 1 second.
+	}
+	
+	// Setting the countdown.
+	// 1 second: 15625L
+	// 1 ms: 16L
+	TCNT1 = 65536-(ms * 16L);
+	
 	// Start timer 1 with prescaler 1024
 	TCCR1B = 0b00000101;
 }
@@ -53,7 +63,7 @@ void TimerEnd()
 void TestTimer()
 {	
 	SendString(UART_PC, "TestTimer start\r\n");
-	TimerStart();
+	TimerStart(500);
 	while(CheckTimeout() == 0)
 	{}
 	TimerEnd();
@@ -68,15 +78,20 @@ void TogglerPower()
 	// Set high
 	PORTE |= (1 << 4);
 	
-	TimerStart();
+	
+	while(1)
+	{
+		
+	}
+	TimerStart(2000);
 	while(CheckTimeout()){};
 	TimerEnd();
 	
 	PORTE &= ~(1 << 4);
 	
-	TimerStart();
-	while(CheckTimeout()){};
-	TimerEnd();
+	//TimerStart(3000);
+	//while(CheckTimeout()){};
+	//TimerEnd();
 }
 
 
@@ -142,7 +157,7 @@ int ReadSMS()
 	int res = sendATcommand("AT+CMGL=\"REC UNREAD\"", UART_GSM, "OK", unreadMessageBuffer);
 	if(res != 0)
 	{
-		SendString(UART_PC, "Something bad happened while reading SMS\r\n").		
+		SendString(UART_PC, "Something bad happened while reading SMS\r\n");	
 	}
 	
 	// Parse the received messages 

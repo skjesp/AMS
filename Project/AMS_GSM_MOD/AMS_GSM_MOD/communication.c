@@ -154,7 +154,7 @@ int sendATcommand(char* ATcommand, int selected_UART, char* expectedResult, char
 				
 	int i = 0;	
 	char c;
-	TimerStart();
+	TimerStart(3000);
 	
 	char response [255] = "";
 	

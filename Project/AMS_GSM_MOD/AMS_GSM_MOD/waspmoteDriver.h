@@ -9,7 +9,7 @@ void SetupCountdown(unsigned int seconds);
 void StartCountdown();
 void CheckCountdown();
 void TestTimer();
-void TimerStart();
+void TimerStart(unsigned int ms);
 int CheckTimeout();
 void TimerEnd();
 int unlockSim(char* simCode);
