@@ -19,11 +19,13 @@ int main()
 	}
 	
 	// This function is OK
-	//SendSMS("testing SensSMS function.", "+4523920863");
-	//sendATcommand("AT+CMGF=1", UART_GSM, "OK");
-	//sendATcommand("AT+CMGS=\"+4523920863\"", UART_GSM, ">");	
+	// fars telefonnr: +4523920863
+	// lasses tlf: +4522925623
+	
+	//SendSMS("SMS test is the best.", "+4522925623");
 	
 	
+	ReadSMS();
 	SendString(UART_PC, "Going to while loop\r\n");
 	while(1)
 	{	
