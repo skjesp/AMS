@@ -154,19 +154,18 @@ int SendSMS(char* message, char* phoneNumber)
 int ReadSMS()
 {
 	// allocating 2KB to 
-	char unreadMessageBuffer[255] = "";
+	char unreadMessageBuffer[1024] = "";
 	
-	SendString(UART_GSM, "AT+CMGR=\"ALL\"");
-	
-	
-		
-	int res = sendATcommand("AT+CMGR=\"1\"", UART_GSM, "OK", unreadMessageBuffer);
+	//SendString(UART_GSM, "AT+CMGL=\"ALL\"\r\n");	
+	int res = sendATcommand("AT+CMGL=\"ALL\"", UART_GSM, "OK", unreadMessageBuffer);
 	if(res != 0)
 	{
 		SendString(UART_PC, "Something bad happened while reading SMS\r\n");	
 	}
 	SendString(UART_PC, "List of messages\r\n");
 	SendString(UART_PC, unreadMessageBuffer);
+	SendString(UART_PC, "\r\n");
+	
 	// Parse the received messages 	
 	return 0;
 }
