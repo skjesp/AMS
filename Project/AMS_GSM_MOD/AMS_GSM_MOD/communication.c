@@ -18,7 +18,7 @@ void EnableUART(int uartNum)
 			UCSR0A = 0b00100000;
 			UCSR0B = 0b00011000; // enable transmitter and receiver. No interrupts.
 			UCSR0C = 0b00000110; // 8 databit
-			UBRR0 = 8; // Baud set to 115200. See slide 36 lecture 17 MSYS. 9600 baud
+			UBRR0 = 103; // Baud set to 115200. See slide 36 lecture 17 MSYS. 9600 baud
 			break;
 		
 		case 1:
