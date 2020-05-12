@@ -21,11 +21,6 @@ void Setup()
 	TCNT1 = 65536-(3*15625L); // 3 overflow each three seconds.
 	TCCR1A = 0b00000000;
 	//TCCR1B = 0b00000101; // Prescaler 1024	
-	
-	// Set preffered memory in simcard. 
-	// TODO: not utilizing return to anything.
-	sendATcommand("AT+CPMS=\"SM\",\"SM\",\"SM\"", UART_GSM, "OK", NULL);
-	sendATcommand("AT+CMGF=1", UART_GSM, "OK", NULL);	
 }
 
 void TimerStart(unsigned int ms)
@@ -108,7 +103,14 @@ void StartGSM()
 	while(res != 0)
 	{		
 		res = sendATcommand("AT", UART_GSM, "OK", NULL);		
-	}	
+	}
+	
+	// Set preffered memory in simcard. 
+	// TODO: not utilizing return to anything.
+	SendString(UART_PC, "Setting prefered memory sections.\r\n");	
+	sendATcommand("AT+CPMS=\"SM\",\"SM\",\"SM\"", UART_GSM, "OK", NULL);
+	SendString(UART_PC, "Setting GSM to textmode.\r\n");	
+	sendATcommand("AT+CMGF=1", UART_GSM, "OK", NULL);	
 }
 
 int unlockSim(char* simCode)
