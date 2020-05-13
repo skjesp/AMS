@@ -244,8 +244,20 @@ static void GetPhonenumber(char *buf, char *phoneNumber)
 }
 
 
+//run()
+//{
+	//char receiveBuffer[BUFFER_SIZE] = "";	
+	//while(1)
+	//{
+		//while(!CharReady(UART_GSM))
+		//{}
+			//
+		//
+	//}	
+//}
 
-// Gets MC to run in a listener state.
+
+ //Gets MC to run in a listener state.
 void run()
 {	
 	//char c;
@@ -256,38 +268,55 @@ void run()
 	int j = 0;
 	
 	// TEST
-	SendString(UART_GSM, "AT+CMGL=\"ALL\"");
+	SendString(UART_PC,"Testing command:\r\n");
+	//sendATcommand("AT+CMGL=\"ALL\"", UART_GSM, "Test", buffer_payload);
+	SendString(UART_GSM, "AT+CMGL=\"ALL\"\r\n\0");
 	
 	while(1)
 	{
-		buffer_header[i] = ReadChar(UART_GSM);
-		// Check if buffer contains newline
-		if (buffer_header[i] == 12)
+		if(CharReady(UART_GSM))
 		{
-			// Get the phonenumber from command
-			GetPhonenumber(buffer_header, phonenumber);			
-			if (strcmp(phonenumber, UserPhonenumber) == 0)
-			{				
-				while(1)
-				{
-					buffer_payload[j] = ReadChar(UART_GSM);
-					// Check if buffer contains newline
-					if(buffer_payload[j] == 12)
-					{
-						handleCommand(buffer_payload);
-						j = 0;
-						memset(buffer_payload, 0, BUFFER_SIZE);
-						break;
-					}
-					j++;
-				}							
-			}			
-			i = 0;
-			memset(buffer_header, 0, BUFFER_SIZE);
+			buffer_header[i] = ReadChar(UART_GSM);
+			//SendChar(UART_PC, buffer_header[i]);
+			i++;
 		}
 		else
 		{
-			i++;
-		}						
+			if(strstr(buffer_header,"\r") != NULL)
+			{
+				SendString(UART_PC, buffer_header);
+				//memset(buffer_header, 0, BUFFER_SIZE);	
+			}
+			
+		}
+		
+		//// Check if buffer contains newline
+		//if (buffer_header[i] == 12)
+		//{
+			//// Get the phonenumber from command
+			//GetPhonenumber(buffer_header, phonenumber);			
+			//if (strcmp(phonenumber, UserPhonenumber) == 0)
+			//{				
+				//while(1)
+				//{
+					//buffer_payload[j] = ReadChar(UART_GSM);
+					//// Check if buffer contains newline
+					//if(buffer_payload[j] == 12)
+					//{
+						//handleCommand(buffer_payload);
+						//j = 0;
+						//memset(buffer_payload, 0, BUFFER_SIZE);
+						//break;
+					//}
+					//j++;
+				//}							
+			//}			
+			//i = 0;
+			//memset(buffer_header, 0, BUFFER_SIZE);
+		//}
+		//else
+		//{
+			//i++;
+		//}						
 	}	
 }
