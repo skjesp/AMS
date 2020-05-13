@@ -31,6 +31,10 @@ int main()
 	SendString(UART_PC, "Going to while loop\r\n");
 	
 	
+	run();
+	
+	
+	
 	char c;
 	while(1)
 	{	

@@ -62,6 +62,7 @@ unsigned char CharReady(int uartNum){
 }
 
 
+
 char ReadChar(int uartNum)
 {	
 	switch(uartNum)

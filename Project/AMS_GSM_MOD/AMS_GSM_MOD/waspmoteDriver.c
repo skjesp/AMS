@@ -6,6 +6,7 @@
  */ 
 
 #include "waspmoteDriver.h"
+#define BUFFER_SIZE 255
 static char UserPhonenumber[] = "+4593203866";
 
 void Setup()
@@ -113,7 +114,11 @@ void StartGSM()
 	SendString(UART_PC, "Setting GSM to textmode.\r\n");	
 	sendATcommand("AT+CMGF=1", UART_GSM, "OK", NULL);
 	
-	sendATcommand("AT+CNMI=1,2,0,0,0", UART_GSM, "OK", NULL);
+	res = sendATcommand("AT+CNMI=1,2,0,0,0", UART_GSM, "OK", NULL);
+	while(res != 0)
+	{
+		res = sendATcommand("AT+CNMI=1,2,0,0,0", UART_GSM, "OK", NULL);
+	}
 }
 
 int unlockSim(char* simCode)
@@ -213,11 +218,11 @@ void getUserInput()
 }
 
 
-int handleCommand(char *msg)
+void handleCommand(char *msg)
 {
-	
-	
-	
+	SendString(UART_PC, "Received the message: ");
+	SendString(UART_PC, msg);
+	SendString(UART_PC, "\r\n");
 }
 
 
@@ -240,26 +245,49 @@ static void GetPhonenumber(char *buf, char *phoneNumber)
 
 
 
-void listenState()
-{
-	
-	char c;
-	char buffer[255] = "";
+// Gets MC to run in a listener state.
+void run()
+{	
+	//char c;
+	char buffer_header[BUFFER_SIZE] = "";
+	char buffer_payload[BUFFER_SIZE] = "";
 	char phonenumber[15] = "";
 	int i = 0;
+	int j = 0;
+	
+	// TEST
+	SendString(UART_GSM, "AT+CMGL=\"ALL\"");
+	
 	while(1)
 	{
-		buffer[i] = ReadChar(UART_GSM);
+		buffer_header[i] = ReadChar(UART_GSM);
 		// Check if buffer contains newline
-		if (buffer[i] == 12)
+		if (buffer_header[i] == 12)
 		{
 			// Get the phonenumber from command
-			GetPhonenumber(buffer, phonenumber);			
+			GetPhonenumber(buffer_header, phonenumber);			
 			if (strcmp(phonenumber, UserPhonenumber) == 0)
-			{
-				// handle command
+			{				
+				while(1)
+				{
+					buffer_payload[j] = ReadChar(UART_GSM);
+					// Check if buffer contains newline
+					if(buffer_payload[j] == 12)
+					{
+						handleCommand(buffer_payload);
+						j = 0;
+						memset(buffer_payload, 0, BUFFER_SIZE);
+						break;
+					}
+					j++;
+				}							
 			}			
+			i = 0;
+			memset(buffer_header, 0, BUFFER_SIZE);
 		}
-		i++;				
+		else
+		{
+			i++;
+		}						
 	}	
 }
