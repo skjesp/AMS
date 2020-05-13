@@ -14,4 +14,5 @@ int CheckTimeout();
 void TimerEnd();
 int unlockSim(char* simCode);
 int SendSMS(char* message, char* phoneNumber);
+void DisplayHelp();
 #endif

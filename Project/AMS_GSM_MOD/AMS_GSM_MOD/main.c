@@ -27,45 +27,36 @@ int main()
 	// This function is OK.
 	//ReadSMS();
 	
-	// **************************************************
-	// Print choices:
-	// PrintMenu();
-	SendString(UART_PC, "These are the choices:\r\nChoice 1\r\nChoice 2\r\n");
+	void DisplayHelp();
+	SendString(UART_PC, "Going to while loop\r\n");
 	
-	char ResponseBuffer[255];
-	int i = 0;
+	
 	char c;
 	while(1)
-	{
-		while(1)
-		{
-			c = ReadChar(UART_PC);
-			if(c != 12) // if not newline
-			{
-				ResponseBuffer[i] = c;
-				i++;
-				// Echo the char
-				SendChar(UART_PC, c);
-			}
-			else{
-				break;
-			}
-		}
-		SendString(UART_PC, "Received input: \r\n");
-		SendString(UART_PC, ResponseBuffer);
-	}
-	
-	// **************************************************
-	
-	
-	
-	
-	SendString(UART_PC, "Going to while loop\r\n");
-	while(1)
 	{	
-		char c = ReadChar(UART_GSM);	
-		SendChar(UART_PC, c);			
+		// Check for new input
+		// Has command been given?
+		// ************ Prompt User **********
+		c = ReadChar(UART_PC);
+		
+		switch (c)		
+		{
+			case '1':
+				SendString(UART_PC, "Sending message to user\r\n");
+				break;
+			
+			case '2':
+				SendString(UART_PC, "Reading all messages\r\n");
+				break;
+		}
+		
+		// ***********************************	
+		// If new command given: Handle command
+		// Clear inputbuffer when done		
 	}
+
+//char c = ReadChar(UART_GSM);	
+		//SendChar(UART_PC, c);			
 
 	
 	return 0;

@@ -6,6 +6,7 @@
  */ 
 
 #include "waspmoteDriver.h"
+static char UserPhonenumber[] = "+4593203866";
 
 void Setup()
 {
@@ -110,7 +111,9 @@ void StartGSM()
 	SendString(UART_PC, "Setting prefered memory sections.\r\n");	
 	sendATcommand("AT+CPMS=\"SM\",\"SM\",\"SM\"", UART_GSM, "OK", NULL);
 	SendString(UART_PC, "Setting GSM to textmode.\r\n");	
-	sendATcommand("AT+CMGF=1", UART_GSM, "OK", NULL);	
+	sendATcommand("AT+CMGF=1", UART_GSM, "OK", NULL);
+	
+	sendATcommand("AT+CNMI=1,2,0,0,0", UART_GSM, "OK", NULL);
 }
 
 int unlockSim(char* simCode)
@@ -170,4 +173,93 @@ int ReadSMS()
 	
 	// Parse the received messages 	
 	return 0;
+}
+
+
+void DisplayHelp()
+{
+	SendString(UART_PC, "1: Read SMS\r\n2: Send SMS\r\n");
+}
+
+
+
+// To be utilized in debugging.
+void getUserInput()
+{
+	char ResponseBuffer[255];
+	int i = 0;
+	char c;
+	while(1)
+	{
+		while(1)
+		{
+			c = ReadChar(UART_PC);
+			if(c != 13) // if not carriage return
+			{
+				ResponseBuffer[i] = c;
+				i++;
+				// Echo the char
+				SendChar(UART_PC, c);
+			}
+			else{
+				SendString(UART_PC, "Breaking loop: \r\n");
+				break;
+			}
+		}
+		SendString(UART_PC, "Received input: \r\n");
+		SendString(UART_PC, ResponseBuffer);
+		SendString(UART_PC, "\r\n");
+	}
+}
+
+
+int handleCommand(char *msg)
+{
+	
+	
+	
+}
+
+
+// Tokenize buffer. Get the phonenumber that send the command.
+static void GetPhonenumber(char *buf, char *phoneNumber)
+{	
+	char *token;
+	token = strtok(buf, "\""); // result type
+	
+	if(strstr(token, "+CMT") != NULL)
+	{
+		token = strtok(buf, "\""); // phone number
+		strcpy(phoneNumber, token);		
+	}
+	else
+	{
+		phoneNumber = NULL;
+	}
+}
+
+
+
+void listenState()
+{
+	
+	char c;
+	char buffer[255] = "";
+	char phonenumber[15] = "";
+	int i = 0;
+	while(1)
+	{
+		buffer[i] = ReadChar(UART_GSM);
+		// Check if buffer contains newline
+		if (buffer[i] == 12)
+		{
+			// Get the phonenumber from command
+			GetPhonenumber(buffer, phonenumber);			
+			if (strcmp(phonenumber, UserPhonenumber) == 0)
+			{
+				// handle command
+			}			
+		}
+		i++;				
+	}	
 }
