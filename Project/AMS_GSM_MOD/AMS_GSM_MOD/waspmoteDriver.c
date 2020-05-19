@@ -6,8 +6,10 @@
  */ 
 
 #include "waspmoteDriver.h"
+// Todo: Use EEPROM to store userphonenumber
+//#include <EEPROM.h>
 #define BUFFER_SIZE 255
-static char UserPhonenumber[] = "+4593203866";
+static const char UserPhonenumber[] = "+4593203866";
 
 void Setup()
 {
@@ -218,13 +220,6 @@ void getUserInput()
 }
 
 
-void handleCommand(char *msg)
-{
-	SendString(UART_PC, "Received the message: ");
-	SendString(UART_PC, msg);
-	SendString(UART_PC, "\r\n");
-}
-
 
 // Tokenize buffer. Get the phonenumber that send the command.
 static void GetPhonenumber(char *buf, char *phoneNumber)
@@ -257,66 +252,112 @@ static void GetPhonenumber(char *buf, char *phoneNumber)
 //}
 
 
+void ListenForSMS(char* rec_buf)
+{
+	int i = 0;
+	while(!CharReady(UART_GSM)){};
+	//SendString(UART_GSM, "AT+CMGL=\"ALL\"\r\n\0");
+	TimerStart(3000);
+	while(!CheckTimeout())
+	{
+		if(CharReady(UART_GSM))
+		{
+			rec_buf[i] = ReadChar(UART_GSM);
+			//SendChar(UART_PC, buffer_header[i]);
+			i++;
+		}
+	}
+	TimerEnd();
+	SendString(UART_PC, "The received message was:\r\n");
+	SendString(UART_PC, rec_buf);	
+}
+
+
+
+void ParseCommand(char* receiveBuffer, char* phonenumber_buf, char* payload_buf)
+{
+	/// Testing purpose:
+	char testbuffer[] = {13, 10, 43, 67, 77, 84, 58, 32, 34, 43, 52, 53, 57, 51, 50, 48, 51, 56, 54, 54, 34, 44, 34, 34, 44, 34, 50, 48, 47, 48, 53, 47, 49, 54, 44, 49, 50, 58, 51, 48, 58, 52, 54, 43, 48, 56, 34, 13, 10, 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 13, 10, 0};	
+	
+	// Tokenize with vertical tab and backspace.
+	char *header;
+	header = strtok(testbuffer, "\r\n");
+	SendString(UART_PC, "Message header is: ");
+	SendString(UART_PC, header);
+	SendString(UART_PC, "\r\n");
+		
+	//payload_buf = strtok(NULL, "\r\n");	
+	strcpy(payload_buf, strtok(NULL, "\r\n"));
+	
+	SendString(UART_PC, "Message payload is: ");
+	SendString(UART_PC, payload_buf);
+	SendString(UART_PC, "\r\n");
+	
+	// Get phonenumber from header string.
+	strtok(header, "\"");	
+	strcpy(phonenumber_buf, strtok(NULL, "\""));
+	
+	SendString(UART_PC, "Phonenumber is: ");
+	SendString(UART_PC, phonenumber_buf);
+	SendString(UART_PC, "\r\n");
+}
+
+
+int Authenticate(char *received_number)
+{
+	if(strcmp(received_number, UserPhonenumber) == 0)
+	{
+		SendString(UART_PC, "Phonenumber authentication: OK\r\n");
+		return 0;
+	}
+	else
+	{
+		SendString(UART_PC, "Phonenumber authentication: FAIL\r\n");
+		return -1;
+	}
+}
+
+
+int HandleCommand(char* payload)
+{
+	SendString(UART_PC, "Payload is: \r\n");
+	SendString(UART_PC, payload);
+	SendString(UART_PC, "\r\n");
+	if(strcmp(payload, "Hello world") == 0)
+	{
+		SendString(UART_PC, "Hello world function!\r\n");
+	}
+	else if(strcmp(payload, "UNLOCK") == 0)
+	{
+		SendString(UART_PC, "UNLOCK function called.\r\n");
+	}
+	else if(strcmp(payload, "LOCK")  == 0)
+	{
+		SendString(UART_PC, "LOCK function called.\r\n");
+	}
+	else
+	{
+		SendString(UART_PC, "Unknown command received.\r\n");
+	}
+}
+
+
  //Gets MC to run in a listener state.
 void run()
 {	
 	//char c;
 	char buffer_header[BUFFER_SIZE] = "";
 	char buffer_payload[BUFFER_SIZE] = "";
-	char phonenumber[15] = "";
-	int i = 0;
-	int j = 0;
-	
-	// TEST
-	SendString(UART_PC,"Testing command:\r\n");
-	//sendATcommand("AT+CMGL=\"ALL\"", UART_GSM, "Test", buffer_payload);
-	SendString(UART_GSM, "AT+CMGL=\"ALL\"\r\n\0");
-	
+	char phonenumber[15] = "";	
 	while(1)
 	{
-		if(CharReady(UART_GSM))
+		//ListenForSMS(buffer_header); // OK
+		ParseCommand(buffer_header, phonenumber, buffer_payload);
+		if(Authenticate(phonenumber) != 0)
 		{
-			buffer_header[i] = ReadChar(UART_GSM);
-			//SendChar(UART_PC, buffer_header[i]);
-			i++;
+			SendString(UART_PC,"Notifying user\r\n");
+			while(1){};
 		}
-		else
-		{
-			if(strstr(buffer_header,"\r") != NULL)
-			{
-				SendString(UART_PC, buffer_header);
-				//memset(buffer_header, 0, BUFFER_SIZE);	
-			}
-			
-		}
-		
-		//// Check if buffer contains newline
-		//if (buffer_header[i] == 12)
-		//{
-			//// Get the phonenumber from command
-			//GetPhonenumber(buffer_header, phonenumber);			
-			//if (strcmp(phonenumber, UserPhonenumber) == 0)
-			//{				
-				//while(1)
-				//{
-					//buffer_payload[j] = ReadChar(UART_GSM);
-					//// Check if buffer contains newline
-					//if(buffer_payload[j] == 12)
-					//{
-						//handleCommand(buffer_payload);
-						//j = 0;
-						//memset(buffer_payload, 0, BUFFER_SIZE);
-						//break;
-					//}
-					//j++;
-				//}							
-			//}			
-			//i = 0;
-			//memset(buffer_header, 0, BUFFER_SIZE);
-		//}
-		//else
-		//{
-			//i++;
-		//}						
-	}	
+		HandleCommand(buffer_payload);
+	}
 }
