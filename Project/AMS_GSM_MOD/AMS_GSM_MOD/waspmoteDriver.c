@@ -239,19 +239,6 @@ static void GetPhonenumber(char *buf, char *phoneNumber)
 }
 
 
-//run()
-//{
-	//char receiveBuffer[BUFFER_SIZE] = "";	
-	//while(1)
-	//{
-		//while(!CharReady(UART_GSM))
-		//{}
-			//
-		//
-	//}	
-//}
-
-
 void ListenForSMS(char* rec_buf)
 {
 	int i = 0;
@@ -277,11 +264,11 @@ void ListenForSMS(char* rec_buf)
 void ParseCommand(char* receiveBuffer, char* phonenumber_buf, char* payload_buf)
 {
 	/// Testing purpose:
-	char testbuffer[] = {13, 10, 43, 67, 77, 84, 58, 32, 34, 43, 52, 53, 57, 51, 50, 48, 51, 56, 54, 54, 34, 44, 34, 34, 44, 34, 50, 48, 47, 48, 53, 47, 49, 54, 44, 49, 50, 58, 51, 48, 58, 52, 54, 43, 48, 56, 34, 13, 10, 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 13, 10, 0};	
+	//char testbuffer[] = {13, 10, 43, 67, 77, 84, 58, 32, 34, 43, 52, 53, 57, 51, 50, 48, 51, 56, 54, 54, 34, 44, 34, 34, 44, 34, 50, 48, 47, 48, 53, 47, 49, 54, 44, 49, 50, 58, 51, 48, 58, 52, 54, 43, 48, 56, 34, 13, 10, 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 13, 10, 0};	
 	
 	// Tokenize with vertical tab and backspace.
 	char *header;
-	header = strtok(testbuffer, "\r\n");
+	header = strtok(receiveBuffer, "\r\n");
 	SendString(UART_PC, "Message header is: ");
 	SendString(UART_PC, header);
 	SendString(UART_PC, "\r\n");
@@ -334,7 +321,7 @@ int HandleCommand(char* payload)
 	else if(strcmp(payload, "LOCK")  == 0)
 	{
 		SendString(UART_PC, "LOCK function called.\r\n");
-	}
+	}	
 	else
 	{
 		SendString(UART_PC, "Unknown command received.\r\n");
@@ -351,11 +338,12 @@ void run()
 	char phonenumber[15] = "";	
 	while(1)
 	{
-		//ListenForSMS(buffer_header); // OK
+		ListenForSMS(buffer_header); // OK
 		ParseCommand(buffer_header, phonenumber, buffer_payload);
 		if(Authenticate(phonenumber) != 0)
 		{
-			SendString(UART_PC,"Notifying user\r\n");
+			// Authentication failed
+			SendString(UART_PC,"Notifying user\r\n");			
 			while(1){};
 		}
 		HandleCommand(buffer_payload);
