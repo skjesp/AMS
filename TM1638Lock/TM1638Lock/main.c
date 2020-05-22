@@ -24,8 +24,7 @@ uint8_t posArr[4] = {0, 1, 2, 3};
 
 int main(void)
 {
-	uint8_t a =1;
-	
+	const uint8_t a = 1;	
     Initialize(a, a);
 }
 
