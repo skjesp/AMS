@@ -27,41 +27,8 @@ int main()
 	// This function is OK.
 	//ReadSMS();
 	
-	void DisplayHelp();
+	DisplayHelp();
 	SendString(UART_PC, "Going to while loop\r\n");
-	
-	
 	run();
-	
-	
-	
-	char c;
-	while(1)
-	{	
-		// Check for new input
-		// Has command been given?
-		// ************ Prompt User **********
-		c = ReadChar(UART_PC);
-		
-		switch (c)		
-		{
-			case '1':
-				SendString(UART_PC, "Sending message to user\r\n");
-				break;
-			
-			case '2':
-				SendString(UART_PC, "Reading all messages\r\n");
-				break;
-		}
-		
-		// ***********************************	
-		// If new command given: Handle command
-		// Clear inputbuffer when done		
-	}
-
-//char c = ReadChar(UART_GSM);	
-		//SendChar(UART_PC, c);			
-
-	
 	return 0;
 }
