@@ -2,7 +2,6 @@
 *.o
 *.d
 Project/AMS_GSM_MOD/.vs/AMS_GSM_MOD/v14/.atsuo
-*.cproj
 *.elf
 *.hex
 *.lss
