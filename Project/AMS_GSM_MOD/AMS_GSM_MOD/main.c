@@ -9,39 +9,35 @@
 
 // TODO:
 #include "sg92r.h"
-
+//#define F_CPU 6600000
 int main()
-{
-	Setup();
-	EnableUART(UART_PC);
-	DDRE |= (1<<PE4)|(1<<PE5); 
-	TIMSK3 |= 0b00000001;
-	TCCR3A|=(1<<COM3A1)|(1<<COM3B1)|(1<<WGM31);        //NON Inverted PWM
-	TCCR3B|=(1<<WGM33)|(1<<WGM32)|(1<<CS31)|(1<<CS30); //PRESCALER=64 MODE 14(FAST PWM)
+{		
+	DDRB = 0xFF;
+	PORTB = 0;	
+	TCCR1A = 0b10000010;
+	TCCR1B = 0b00010100; // mode 10, prescaler 256
+	ICR1 = 625;
+	// Control dutycycle. Keep it between ~0.05 and ~0.1
+	OCR1A = 625*0.05;
+	while(1){};
+	
+	DDRE = 0xFF;
+	PORTE = 0;
+	// Mode = 3 (PWM, Phase Correct, 10 bit)
+	// Set OC1A on match down counting / Clear OC1A on match up counting
+	// Clock prescaler = 1
 	
 	
-	ICR3=4999;  //fPWM=50Hz	
-	OCR3C = 250;
+	TCCR3A = 0b10000011;
+	TCCR3B = 0b00000001;
+	
+	//TCCR1A = 0b00000011;
+	//TCCR1B = 0b00010101;
 	
 	
-	while(1){
-		//char buf[255];
-	//itoa(PINE,buf, 10);
-	SendString(UART_PC, "PINE is: ");
-	SendString(UART_PC, PINE);
-	SendString(UART_PC, "\r\n");
-	}
-	
-	//DDRB = 0xFF;
-	//PORTB = 0;
-	//// Mode = 3 (PWM, Phase Correct, 10 bit)
-	//// Set OC1A on match down counting / Clear OC1A on match up counting
-	//// Clock prescaler = 1
-	//TCCR1A = 0b10000011;
-	//TCCR1B = 0b00000001;
-	////ICR3 = 4999;
-	//// Duty cycle = 50%
-	//OCR3A = 1024/2;
+	//ICR3 = 4999;
+	// Duty cycle = 50%
+	OCR3C = 1024/2;
 	
 	
 	while(1){};
