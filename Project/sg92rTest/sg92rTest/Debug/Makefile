@@ -71,8 +71,7 @@ ADDITIONAL_DEPENDENCIES:=
 
 OUTPUT_FILE_DEP:= ./makedep.mk
 
-LIB_DEP+=  \
-C:/Users/lazze/Documents/Atmel\ Studio/7.0/SG92R_AMS/SG92R_AMS/Debug/libSG92R_AMS.a
+LIB_DEP+= 
 
 LINKER_SCRIPT_DEP+= 
 

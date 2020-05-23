@@ -14,6 +14,8 @@ void SGInit()
 {
 	DDRE |= (1<<PE4)|(1<<PE5); 
 	
+	
+	
 	TIMSK3 |= 0b00000001;
 	
 	TCCR3A|=(1<<COM3A1)|(1<<COM3B1)|(1<<WGM31);        //NON Inverted PWM
@@ -23,7 +25,7 @@ void SGInit()
 	
 	TCNT3 = 0;
 	
-	OCR3A = 2000;
+	OCR3C = 250;
 	
 	sei();
 	
@@ -31,7 +33,7 @@ void SGInit()
 
 ISR(TIMER3_OVF_vect)
 {
-	OCR3A = 2000;
+	
 }
 
 

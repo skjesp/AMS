@@ -150,6 +150,12 @@
     <Compile Include="project_definitions.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="sg92r.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="sg92r.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="uart.c">
       <SubType>compile</SubType>
     </Compile>
