@@ -39,14 +39,3 @@ void TimerEnd()
 	// Reset timer 1
 	TIFR3 = 1<<0;
 }
-
-
-//void TestTimer()
-//{
-	////SendString(UART_PC, "TestTimer start\r\n");
-	//TimerStart(500);
-	//while(CheckTimeout() == 0)
-	//{}
-	//TimerEnd();
-	////SendString(UART_PC, "TestTimer end\r\n");
-//}

@@ -2,23 +2,10 @@
 #include "./SG92/sg92r.h"
 int main()
 {			
-	//Setup();
-	////LockedState();
-	//UnlockState();	
-	//
-	//
-	////TestTimer();
-	//
-	//while(1){};	
-	
 	Setup();	
 	StartGSM();
 	
-	if(unlockSim("6913") != 0)
-	{
-		SendString(UART_PC, "Pin was wrong. Closing program\r\n");
-		return 1;
-	}
+	
 	
 	// This function is OK.
 	// johannes tlf: +4523923866

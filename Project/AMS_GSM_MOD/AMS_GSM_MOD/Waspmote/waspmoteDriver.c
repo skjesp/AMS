@@ -2,7 +2,8 @@
 // Todo: Use EEPROM to store userphonenumber
 //#include <EEPROM.h>
 #define BUFFER_SIZE 255
-static const char UserPhonenumber[] = "+4593203866";
+//static const char UserPhonenumber[] = "+4593203866";
+static const char UserPhonenumber[] = "+4523920863";
 
 void Setup()
 {
@@ -11,10 +12,8 @@ void Setup()
 	PORTE &= ~(1 << 4); 
 	//PORTE |= (1 << 4);
 	EnableUART(UART_PC);
-	EnableUART(UART_GSM);	
-	
-	SGInit();
-	
+	EnableUART(UART_GSM);		
+	SGInit();	
 }
 
 
@@ -36,6 +35,7 @@ void TogglerPower()
 	//TimerStart(3000);
 	//while(CheckTimeout()){};
 	//TimerEnd();
+	
 }
 
 
@@ -54,6 +54,14 @@ void StartGSM()
 	while(res != 0)
 	{		
 		res = sendATcommand("AT", UART_GSM, "OK", NULL);		
+	}
+	
+	if(unlockSim("6913") != 0)
+	{
+		SendString(UART_PC, "Pin was wrong. Closing program\r\n");
+		while (1)
+		{
+		}
 	}
 	
 	// Set preffered memory in simcard. 
@@ -100,8 +108,7 @@ int SendSMS(char* message, char* phoneNumber)
 {
 	char cmgs_comm [50] = "AT+CMGS=\"";
 	strcat(cmgs_comm, phoneNumber);
-	strcat(cmgs_comm, "\"");		
-	//sendATcommand("AT+CMGF=1", UART_GSM, "OK", NULL);	
+	strcat(cmgs_comm, "\"");			
 	sendATcommand(cmgs_comm, UART_GSM, ">", NULL);
 	SendString(UART_GSM, message);
 	SendString(UART_GSM, "\x1A");	
@@ -160,24 +167,6 @@ void getUserInput()
 	}
 }
 
-
-
-//// Tokenize buffer. Get the phonenumber that send the command.
-//static void GetPhonenumber(char *buf, char *phoneNumber)
-//{	
-	//char *token;
-	//token = strtok(buf, "\""); // result type
-	//
-	//if(strstr(token, "+CMT") != NULL)
-	//{
-		//token = strtok(buf, "\""); // phone number
-		//strcpy(phoneNumber, token);		
-	//}
-	//else
-	//{
-		//phoneNumber = NULL;
-	//}
-//}
 
 
 void ListenForSMS(char* rec_buf)
@@ -248,51 +237,57 @@ int Authenticate(char *received_number)
 
 int HandleCommand(char* payload)
 {
+	int res = -1;
 	SendString(UART_PC, "Payload is: \r\n");
 	SendString(UART_PC, payload);
 	SendString(UART_PC, "\r\n");
 	if(strcmp(payload, "Hello world") == 0)
 	{
 		SendString(UART_PC, "Hello world function!\r\n");
-		return 0;
+		res = 0;
 	}
 	else if(strcmp(payload, "UNLOCK") == 0)
 	{
 		SendString(UART_PC, "UNLOCK function called.\r\n");
 		UnlockState();
-		return 0;
+		SendSMS("LOCK DISABLED", UserPhonenumber);		
+		res = 0;
 	}
 	else if(strcmp(payload, "LOCK")  == 0)
 	{
-		SendString(UART_PC, "LOCK function called.\r\n");
+		SendString(UART_PC, "LOCK function called.\r\n");		
 		LockedState();
-		return 0;
+		SendSMS("LOCK ENABLED", UserPhonenumber);
+		res = 0;
 	}	
 	else
 	{
 		SendString(UART_PC, "Unknown command received.\r\n");
-		return -1;
+		res = -1;
 	}
+	return res;	
 }
 
 
  //Gets MC to run in a listener state.
 void run()
-{	
-	//char c;
+{				
 	char buffer_header[BUFFER_SIZE] = "";
 	char buffer_payload[BUFFER_SIZE] = "";
 	char phonenumber[15] = "";	
 	while(1)
 	{
+		
 		ListenForSMS(buffer_header); // OK
 		ParseCommand(buffer_header, phonenumber, buffer_payload);
 		if(Authenticate(phonenumber) != 0)
 		{
 			// Authentication failed
-			SendString(UART_PC,"Notifying user\r\n");			
-			while(1){};
+			SendString(UART_PC,"Notifying user\r\n");						
 		}
-		HandleCommand(buffer_payload);
+		else
+		{
+			HandleCommand(buffer_payload);
+		}		
 	}
 }
