@@ -138,36 +138,50 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="communication.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="communication.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="project_definitions.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="sg92r.c">
+    <Compile Include="SG92\sg92r.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="sg92r.h">
+    <Compile Include="SG92\sg92r.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="uart.c">
+    <Compile Include="Test\Timer\timertest.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="uart.h">
+    <Compile Include="Test\Timer\timertest.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="waspmoteDriver.c">
+    <Compile Include="Timer\timer.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="waspmoteDriver.h">
+    <Compile Include="Timer\timer.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="UART\uart.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="UART\uart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Waspmote\waspmoteDriver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Waspmote\waspmoteDriver.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Test" />
+    <Folder Include="Test\Timer" />
+    <Folder Include="Waspmote" />
+    <Folder Include="SG92" />
+    <Folder Include="UART" />
+    <Folder Include="Timer" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

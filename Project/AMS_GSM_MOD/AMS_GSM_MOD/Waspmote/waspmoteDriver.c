@@ -1,10 +1,3 @@
-/*
- * waspmoteDriver.c
- *
- * Created: 13-04-2020 15:14:15
- *  Author: JS
- */ 
-
 #include "waspmoteDriver.h"
 // Todo: Use EEPROM to store userphonenumber
 //#include <EEPROM.h>
@@ -20,54 +13,8 @@ void Setup()
 	EnableUART(UART_PC);
 	EnableUART(UART_GSM);	
 	
-	// Setup timer to measure
-	// 16000000 Hz /1024 = 15625 Hz (15625 steps pr seconds). Maximum wait time is  approx 4.19 seconds.	
-	TCNT1 = 65536-(3*15625L); // 3 overflow each three seconds.
-	TCCR1A = 0b00000000;
-	//TCCR1B = 0b00000101; // Prescaler 1024	
-}
-
-void TimerStart(unsigned int ms)
-{
-	// max allowed is 4096
-	if(ms > 4096){
-		ms = 1000; // default value will be 1 second.
-	}
 	
-	// Setting the countdown.
-	// 1 second: 15625L
-	// 1 ms: 16L
-	TCNT1 = 65536-(ms * 16L);
 	
-	// Start timer 1 with prescaler 1024
-	TCCR1B = 0b00000101;
-}
-
-
-int CheckTimeout()
-{
-	return TIFR1 & 0b00000001; //(1 << 0);
-}
-
-
-void TimerEnd()
-{
-	// Stop timer 1
-	TCCR1B = 0b00000000;
-	// Reset timer 1
-	TIFR1 = 1<<0;		
-}
-
-
-
-void TestTimer()
-{	
-	SendString(UART_PC, "TestTimer start\r\n");
-	TimerStart(500);
-	while(CheckTimeout() == 0)
-	{}
-	TimerEnd();
-	SendString(UART_PC, "TestTimer end\r\n");
 }
 
 
@@ -183,12 +130,6 @@ int ReadSMS()
 }
 
 
-void DisplayHelp()
-{
-	SendString(UART_PC, "1: Read SMS\r\n2: Send SMS\r\n");
-}
-
-
 
 // To be utilized in debugging.
 void getUserInput()
@@ -221,22 +162,22 @@ void getUserInput()
 
 
 
-// Tokenize buffer. Get the phonenumber that send the command.
-static void GetPhonenumber(char *buf, char *phoneNumber)
-{	
-	char *token;
-	token = strtok(buf, "\""); // result type
-	
-	if(strstr(token, "+CMT") != NULL)
-	{
-		token = strtok(buf, "\""); // phone number
-		strcpy(phoneNumber, token);		
-	}
-	else
-	{
-		phoneNumber = NULL;
-	}
-}
+//// Tokenize buffer. Get the phonenumber that send the command.
+//static void GetPhonenumber(char *buf, char *phoneNumber)
+//{	
+	//char *token;
+	//token = strtok(buf, "\""); // result type
+	//
+	//if(strstr(token, "+CMT") != NULL)
+	//{
+		//token = strtok(buf, "\""); // phone number
+		//strcpy(phoneNumber, token);		
+	//}
+	//else
+	//{
+		//phoneNumber = NULL;
+	//}
+//}
 
 
 void ListenForSMS(char* rec_buf)
@@ -313,18 +254,22 @@ int HandleCommand(char* payload)
 	if(strcmp(payload, "Hello world") == 0)
 	{
 		SendString(UART_PC, "Hello world function!\r\n");
+		return 0;
 	}
 	else if(strcmp(payload, "UNLOCK") == 0)
 	{
 		SendString(UART_PC, "UNLOCK function called.\r\n");
+		return 0;
 	}
 	else if(strcmp(payload, "LOCK")  == 0)
 	{
 		SendString(UART_PC, "LOCK function called.\r\n");
+		return 0;
 	}	
 	else
 	{
 		SendString(UART_PC, "Unknown command received.\r\n");
+		return -1;
 	}
 }
 

@@ -6,7 +6,7 @@
  */ 
 //#define XTAL 16000000
 //#define BAUD 115200
-#include "communication.h"
+#include "uart.h"
 #include <avr/io.h>
 #include <string.h>
 
@@ -196,4 +196,9 @@ int sendATcommand(char* ATcommand, int selected_UART, char* expectedResult, char
 			return -1;
 		}		
 	}	
+}
+
+void DisplayHelp()
+{
+	SendString(UART_PC, "1: Read SMS\r\n2: Send SMS\r\n");
 }

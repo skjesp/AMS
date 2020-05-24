@@ -13,11 +13,12 @@
  
  */ 
 
-
 #ifndef SG92R_H_
 #define SG92R_H_
 
 void SGInit();
+void UnlockState();
+void LockedState();
 void RotateLeft();
 void RotateRight();
 void RotateMiddle();
