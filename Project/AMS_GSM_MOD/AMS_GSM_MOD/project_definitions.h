@@ -12,6 +12,7 @@
 #include "./Timer/timer.h"
 #include "./UART/uart.h"
 #include "./Waspmote/waspmoteDriver.h"
+#include "./SG92/sg92r.h"
 
 // Testing
 #include "./Test/Timer/timertest.h"

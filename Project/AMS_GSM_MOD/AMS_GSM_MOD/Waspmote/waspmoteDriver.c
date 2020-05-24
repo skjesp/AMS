@@ -13,7 +13,7 @@ void Setup()
 	EnableUART(UART_PC);
 	EnableUART(UART_GSM);	
 	
-	
+	SGInit();
 	
 }
 
@@ -259,11 +259,13 @@ int HandleCommand(char* payload)
 	else if(strcmp(payload, "UNLOCK") == 0)
 	{
 		SendString(UART_PC, "UNLOCK function called.\r\n");
+		UnlockState();
 		return 0;
 	}
 	else if(strcmp(payload, "LOCK")  == 0)
 	{
 		SendString(UART_PC, "LOCK function called.\r\n");
+		LockedState();
 		return 0;
 	}	
 	else
