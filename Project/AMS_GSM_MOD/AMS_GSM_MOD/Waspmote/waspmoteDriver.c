@@ -3,7 +3,8 @@
 //#include <EEPROM.h>
 #define BUFFER_SIZE 255
 //static const char UserPhonenumber[] = "+4593203866";
-static const char UserPhonenumber[] = "+4523920863";
+//static const char UserPhonenumber[] = "+4523920863";
+static const char UserPhonenumber[] = "+4522925623";
 
 void Setup()
 {
