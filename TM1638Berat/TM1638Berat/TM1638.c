@@ -54,8 +54,11 @@ void TM1638_init(const uint8_t start, const uint8_t brightness)
 	STB_HIGH();
 	
 	TM1638_Config(start, brightness);
-	
-	
+	Display_Digit_And_Dot(posArr[0], dataArr[0], 1);
+	Display_Digit_And_Dot(posArr[1], dataArr[0], 0);
+	Display_Digit_And_Dot(posArr[2], dataArr[0], 0);
+	Display_Digit_And_Dot(posArr[3], dataArr[0], 0);
+		
 }
 
 void TM1638_Start(const uint8_t val)
@@ -182,4 +185,86 @@ void TM1638_Send(const uint8_t addresss, const uint8_t data)
 	TM1638_Write(SET_ADDRESS | addresss);
 	TM1638_Write(data);
 	STB_HIGH();
+}
+
+void TM1638_Handler()
+{
+	keys = TM1638_Read_Keys();
+	switch(keys)
+	{
+		case 1:
+		
+		j++;
+		
+		if(j == 4)
+		{
+			j = 0;
+		}
+		
+		if (j == 0)
+		{
+			Display_Digit_And_Dot(posArr[3], dataArr[3], 0);
+		}
+		else
+		{
+			Display_Digit_And_Dot(posArr[j-1], dataArr[j-1], 0);
+		}
+		
+		Display_Digit_And_Dot(posArr[j], dataArr[j], 1);
+		_delay_ms(500);
+		
+		
+		break;
+		
+		
+		case 2:
+		if(dataArr[j] < 9) {
+			Display_Digit_And_Dot(posArr[j], ++dataArr[j], 1);
+		}
+		else {
+			dataArr[j] = 0;
+			Display_Digit_And_Dot(posArr[j], dataArr[j], 1);
+		}
+		_delay_ms(500);
+		
+		break;
+		
+		case 4:
+		if(dataArr[j] > 0) {
+			Display_Digit_And_Dot(posArr[j], --dataArr[j], 1);
+		}
+		else {
+			dataArr[j] = 9;
+			Display_Digit_And_Dot(posArr[j], dataArr[j], 1);
+		}
+		_delay_ms(500);
+		
+		break;
+		
+		case 8:
+		
+		j--;
+		if(j == -1)
+		{
+			j = 3;
+		}
+		
+		if (j == 3)
+		{
+			Display_Digit_And_Dot(posArr[0], dataArr[0], 0);
+		}
+		else
+		{
+			Display_Digit_And_Dot(posArr[j+1], dataArr[j+1], 0);
+		}
+		
+		Display_Digit_And_Dot(posArr[j], dataArr[j], 1);
+		_delay_ms(500);
+		
+		break;
+		
+		case 16:
+		Display_Digit_And_Dot(7, 1, 0);
+		break;
+	}
 }

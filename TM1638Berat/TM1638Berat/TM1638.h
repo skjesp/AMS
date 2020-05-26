@@ -54,6 +54,8 @@ void Clear_Led(void);
 
 uint8_t Read_Keys(void);
 
+//TODO:: Main method implementation
+void TM1638_Handler();
 
 //Protocol for TM1638
 static void TM1638_Config(const uint8_t start, const uint8_t brightness);
