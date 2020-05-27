@@ -1,3 +1,5 @@
+// Author: Johannes Jespersen
+
 #ifndef WASP_DRIVER_H
 #define WASP_DRIVER_H
 #include "../project_definitions.h"

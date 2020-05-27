@@ -11,6 +11,8 @@
 #include <util/delay.h>
 #include "TM1638.h"
 
+
+
 //TODO:: Define PIN MACRO behaviour
 #define DIO_High() (PORTB |= _BV(DIO))
 #define DIO_LOW() (PORTB &= ~_BV(DIO))
@@ -24,10 +26,13 @@
 
 
 static uint8_t konfig = DISPLAY_ON | MAX_LIGHT_DISP;
+static uint8_t codeArr[4] = {1, 1, 1, 1};
+
 uint8_t keys = 0;
 int j = 0;
 uint8_t posArr[4] = {0, 1, 2, 3};
 uint8_t dataArr[4];
+
 
 PROGMEM const uint8_t displayDigits[10] = {
 	0x3F, // 0
@@ -61,7 +66,8 @@ void TM1638_init(const uint8_t start, const uint8_t brightness)
 	Display_Digit_And_Dot(posArr[0], dataArr[0], 1);
 	Display_Digit_And_Dot(posArr[1], dataArr[0], 0);
 	Display_Digit_And_Dot(posArr[2], dataArr[0], 0);
-	Display_Digit_And_Dot(posArr[3], dataArr[0], 0);		
+	Display_Digit_And_Dot(posArr[3], dataArr[0], 0);
+	Display_Digit_And_Dot(7, 0, 0);		
 }
 
 void TM1638_Start(const uint8_t val)
@@ -266,8 +272,18 @@ void TM1638_Handler()
 		
 		break;
 		
-		case 16:
-		Display_Digit_And_Dot(7, 1, 0);
+		case 16:					
+			if(memcmp(dataArr,codeArr, sizeof(dataArr)) == 0)
+			{
+				// Unlock
+				Display_Digit_And_Dot(7, 1, 0);
+				UnlockState();
+			}
+		break;
+		
+		case 32:
+			Display_Digit_And_Dot(7, 0, 0);
+			LockedState();
 		break;
 	}
 }

@@ -2,9 +2,9 @@
 // Todo: Use EEPROM to store userphonenumber
 //#include <EEPROM.h>
 #define BUFFER_SIZE 255
-//static const char UserPhonenumber[] = "+4593203866";
+static const char UserPhonenumber[] = "+4593203866";
 //static const char UserPhonenumber[] = "+4523920863";
-static const char UserPhonenumber[] = "+4522925623";
+//static const char UserPhonenumber[] = "+4522925623";
 
 void Setup()
 {
@@ -14,7 +14,11 @@ void Setup()
 	//PORTE |= (1 << 4);
 	EnableUART(UART_PC);
 	EnableUART(UART_GSM);		
+	
+	// Init the
 	SGInit();	
+	
+	TM1638_init(1,1);
 }
 
 
@@ -170,10 +174,15 @@ void getUserInput()
 
 
 
-void ListenForSMS(char* rec_buf)
+int ListenForSMS(char* rec_buf)
 {
+	//while(!CharReady(UART_GSM)){};
+	if(!CharReady(UART_GSM))
+	{
+		return 1;
+	};
+
 	int i = 0;
-	while(!CharReady(UART_GSM)){};
 	//SendString(UART_GSM, "AT+CMGL=\"ALL\"\r\n\0");
 	TimerStart(3000);
 	while(!CheckTimeout())
@@ -188,6 +197,7 @@ void ListenForSMS(char* rec_buf)
 	TimerEnd();
 	SendString(UART_PC, "The received message was:\r\n");
 	SendString(UART_PC, rec_buf);	
+	return 0;
 }
 
 
@@ -251,14 +261,14 @@ int HandleCommand(char* payload)
 	{
 		SendString(UART_PC, "UNLOCK function called.\r\n");
 		UnlockState();
-		SendSMS("LOCK DISABLED", UserPhonenumber);		
+		//SendSMS("LOCK DISABLED", UserPhonenumber);		
 		res = 0;
 	}
 	else if(strcmp(payload, "LOCK")  == 0)
 	{
 		SendString(UART_PC, "LOCK function called.\r\n");		
 		LockedState();
-		SendSMS("LOCK ENABLED", UserPhonenumber);
+		//SendSMS("LOCK ENABLED", UserPhonenumber);
 		res = 0;
 	}	
 	else
@@ -270,25 +280,33 @@ int HandleCommand(char* payload)
 }
 
 
+
  //Gets MC to run in a listener state.
 void run()
 {				
 	char buffer_header[BUFFER_SIZE] = "";
 	char buffer_payload[BUFFER_SIZE] = "";
-	char phonenumber[15] = "";	
+	char phonenumber[15] = "";
+	int res;
 	while(1)
-	{
-		
-		ListenForSMS(buffer_header); // OK
-		ParseCommand(buffer_header, phonenumber, buffer_payload);
-		if(Authenticate(phonenumber) != 0)
+	{			
+		// Listen for SMS
+		res = ListenForSMS(buffer_header); // OK
+		if(res == 0)
 		{
-			// Authentication failed
-			SendString(UART_PC,"Notifying user\r\n");						
+			ParseCommand(buffer_header, phonenumber, buffer_payload);
+			if(Authenticate(phonenumber) != 0)
+			{
+				// Authentication failed
+				SendString(UART_PC,"Notifying user\r\n");
+			}
+			else
+			{
+				HandleCommand(buffer_payload);
+			}
 		}
-		else
-		{
-			HandleCommand(buffer_payload);
-		}		
+		
+		// Listen for key
+		TM1638_Handler();
 	}
 }

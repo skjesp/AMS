@@ -6,16 +6,15 @@
  * Har fået søgt inspiration fra ovenstående git repos.
  */ 
 
-#define F_CPU 16000000
-
 #include <avr/io.h>
 #include <util/delay.h>
 #include "TM1638.h"
+//#define F_CPU 16000000
 
-uint8_t keys = 0;
-int j = 0;
-uint8_t posArr[4] = {0, 1, 2, 3};
-uint8_t dataArr[4];
+//uint8_t keys = 0;
+//int j = 0;
+//uint8_t posArr[4] = {0, 1, 2, 3};
+//uint8_t dataArr[4];
 
 int main(void)
 {

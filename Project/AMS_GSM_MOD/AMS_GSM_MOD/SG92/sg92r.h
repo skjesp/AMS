@@ -23,6 +23,4 @@ void RotateLeft();
 void RotateRight();
 void RotateMiddle();
 
-
-
 #endif /* SG92R_H_ */

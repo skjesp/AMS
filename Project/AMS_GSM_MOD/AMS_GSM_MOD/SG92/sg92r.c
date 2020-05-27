@@ -20,19 +20,3 @@ void LockedState()
 {
 	OCR1A = 625*0.11;		
 }
-
-//void RotateLeft()
-//{
-	//OCR3A = 250; //1ms	
-//}
-//
-//void RotateRight()
-//{
-	//OCR3A = 500; //2ms		
-//}
-//
-//void RotateMiddle()
-//{
-	//OCR3A = 375; //1,5ms	
-//}
- //
