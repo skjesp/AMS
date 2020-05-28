@@ -247,14 +247,14 @@ int HandleCommand(char* payload)
 	{
 		SendString(UART_PC, "UNLOCK function called.\r\n");
 		UnlockState();
-		//SendSMS("LOCK DISABLED", UserPhonenumber);		
+		SendSMS("LOCK DISABLED", UserPhonenumber);		
 		res = 0;
 	}
 	else if(strcmp(payload, "LOCK")  == 0)
 	{
 		SendString(UART_PC, "LOCK function called.\r\n");		
 		LockedState();
-		//SendSMS("LOCK ENABLED", UserPhonenumber);
+		SendSMS("LOCK ENABLED", UserPhonenumber);
 		res = 0;
 	}	
 	else

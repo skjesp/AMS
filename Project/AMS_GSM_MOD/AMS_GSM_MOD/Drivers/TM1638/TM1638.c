@@ -278,12 +278,14 @@ void TM1638_Handler()
 				// Unlock
 				Display_Digit_And_Dot(7, 1, 0);
 				UnlockState();
+				SendSMS("LOCK DISABLED", "+4593203866");
 			}
 		break;
 		
 		case 32:
 			Display_Digit_And_Dot(7, 0, 0);
 			LockedState();
+			SendSMS("LOCK ENABLED", "+4593203866");
 		break;
 	}
 }
