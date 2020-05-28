@@ -139,57 +139,52 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="main.c">
+    <Compile Include="Application\main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="ATmega2560\Timer\timer.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="ATmega2560\Timer\timer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="ATmega2560\UART\uart.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="ATmega2560\UART\uart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\SG92\sg92r.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\SG92\sg92r.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\TM1638\TM1638.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\TM1638\TM1638.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\Waspmote\waspmoteDriver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\Waspmote\waspmoteDriver.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="project_definitions.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="SG92\sg92r.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="SG92\sg92r.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Test\Timer\timertest.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Test\Timer\timertest.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Timer\timer.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Timer\timer.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="TM1638\TM1638.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="TM1638\TM1638.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="UART\uart.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="UART\uart.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Waspmote\waspmoteDriver.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Waspmote\waspmoteDriver.h">
-      <SubType>compile</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="TM1638" />
-    <Folder Include="Test" />
-    <Folder Include="Test\Timer" />
-    <Folder Include="Waspmote" />
-    <Folder Include="SG92" />
-    <Folder Include="UART" />
-    <Folder Include="Timer" />
+    <Folder Include="ATmega2560\Timer\" />
+    <Folder Include="ATmega2560\UART\" />
+    <Folder Include="Drivers" />
+    <Folder Include="Drivers\SG92\" />
+    <Folder Include="Drivers\TM1638\" />
+    <Folder Include="Drivers\Waspmote\" />
+    <Folder Include="ATmega2560" />
+    <Folder Include="Application" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

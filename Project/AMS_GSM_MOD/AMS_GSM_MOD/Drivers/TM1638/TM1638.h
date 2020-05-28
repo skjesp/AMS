@@ -11,7 +11,7 @@
 #define TM1638_H_
 
 #include <stdint.h>
-#include "../project_definitions.h"
+#include "../../project_definitions.h"
 //TODO: Settings
 
 // Data, Clock and Strobe settings

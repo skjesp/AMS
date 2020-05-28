@@ -1,6 +1,6 @@
 #ifndef GSM_PROJ_UART_H
 #define GSM_PROJ_UART_H
-#include "../project_definitions.h"
+#include "../../project_definitions.h"
 
 void EnableUART(int uartNum);
 char ReadChar(int uartNum);

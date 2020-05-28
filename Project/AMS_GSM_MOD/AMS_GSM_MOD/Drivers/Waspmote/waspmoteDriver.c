@@ -3,27 +3,23 @@
 //#include <EEPROM.h>
 #define BUFFER_SIZE 255
 static const char UserPhonenumber[] = "+4593203866";
-//static const char UserPhonenumber[] = "+4523920863";
-//static const char UserPhonenumber[] = "+4522925623";
 
 void Setup()
 {
 	// Set pin as output
 	DDRE = 0b11111111;	
-	PORTE &= ~(1 << 4); 
-	//PORTE |= (1 << 4);
+	PORTE &= ~(1 << 4); 	
 	EnableUART(UART_PC);
-	EnableUART(UART_GSM);		
+	EnableUART(UART_GSM);
 	
 	// Init the
 	SGInit();	
-	
 	TM1638_init(1,1);
+	StartGSM();
 }
 
 
 
-// Note: Alternative power off by AT command
 void TogglerPower()
 {	
 	SendString(UART_PC, "Toggling power.\r\n");
@@ -31,16 +27,9 @@ void TogglerPower()
 	// Set high
 	PORTE |= (1 << 4);
 	TimerStart(2000);
-	while(CheckTimeout() == 0){		
-		};
-	TimerEnd();
-	
+	while(CheckTimeout() == 0){	};
+	TimerEnd();	
 	PORTE &= ~(1 << 4);
-	
-	//TimerStart(3000);
-	//while(CheckTimeout()){};
-	//TimerEnd();
-	
 }
 
 
@@ -204,9 +193,6 @@ int ListenForSMS(char* rec_buf)
 
 void ParseCommand(char* receiveBuffer, char* phonenumber_buf, char* payload_buf)
 {
-	/// Testing purpose:
-	//char testbuffer[] = {13, 10, 43, 67, 77, 84, 58, 32, 34, 43, 52, 53, 57, 51, 50, 48, 51, 56, 54, 54, 34, 44, 34, 34, 44, 34, 50, 48, 47, 48, 53, 47, 49, 54, 44, 49, 50, 58, 51, 48, 58, 52, 54, 43, 48, 56, 34, 13, 10, 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 13, 10, 0};	
-	
 	// Tokenize with vertical tab and backspace.
 	char *header;
 	header = strtok(receiveBuffer, "\r\n");

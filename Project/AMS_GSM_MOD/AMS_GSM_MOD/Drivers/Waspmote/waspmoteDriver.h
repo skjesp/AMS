@@ -2,7 +2,7 @@
 
 #ifndef WASP_DRIVER_H
 #define WASP_DRIVER_H
-#include "../project_definitions.h"
+#include "../../project_definitions.h"
 
 // Waspmote functions
 void Setup();
